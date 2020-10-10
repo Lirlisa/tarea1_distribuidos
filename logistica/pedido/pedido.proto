@@ -1,0 +1,27 @@
+syntax="proto3";
+
+package pedido;
+
+enum Estatus {
+    OK = 0;
+    PERDIDO = 1;
+    EN_CAMINO = 2;
+    ERROR = 3;
+}
+
+message Producto {
+    uint32 ID = 1;
+}
+
+message Encargo {
+    string tipo_local = 1;
+    string nombre_producto = 2;
+    uint32 valor = 3;
+    string origen = 4;
+    string destino = 5;
+}
+
+service Interacciones {
+    rpc Encargar (Encargo) returns (Encargo) {}
+    rpc Estado_encargo (Producto) returns (Producto) {}
+}
