@@ -4,6 +4,7 @@ import (
 	"context"
 	"log"
 
+	"./pedido"
 	"google.golang.org/grpc"
 )
 
@@ -16,19 +17,18 @@ func main() {
 	}
 	defer conn.Close()
 
-	cliente := chat.NewChatServiceClient(conn)
+	cliente := pedido.NewInteraccionesClient(conn)
 
-	response, err := cliente.Encargar(context.Background(), &chat.Encargo{
-		tipo_local="retail",
-		nombre_producto="Nada",
-		valor=0,
-		origen="tiendaA",
-		destino="casaA",
-	
+	response, err := cliente.Encargar(context.Background(), &pedido.Encargo{
+		TipoLocal:      "retail",
+		NombreProducto: "Nada",
+		Valor:          0,
+		Origen:         "tiendaA",
+		Destino:        "casaA",
 	})
 	if err != nil {
 		log.Fatalf("Error al Encargar: %s", err)
 	}
-	log.Printf("Response from server:")
+	log.Printf("Response from server: %s", response.TipoLocal)
 
 }
