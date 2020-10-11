@@ -74,9 +74,9 @@ func recibir(archivo string, tienda int, conn *grpc.ClientConn) {
 				tipo = "retail"
 			}
 
-			cliente := pedido.NewInteraccionesClient(conn)
+			cliente_ := pedido.NewInteraccionesClient(conn)
 			aux1, _ = strconv.Atoi(record[value][2])
-			response, err := cliente.Encargar(context.Background(), &pedido.Encargo{
+			response, err := cliente_.Encargar(context.Background(), &pedido.Encargo{
 				TipoLocal:      tipo,
 				NombreProducto: record[value][1],
 				Valor:          uint32(aux1),
@@ -102,7 +102,7 @@ func recibir(archivo string, tienda int, conn *grpc.ClientConn) {
 
 }
 
-func cliente(seguimiento int, conn *grpc.ClientConn) {
+func cliente(seguimiento uint32, conn *grpc.ClientConn) {
 	var consulta int
 
 	for {
@@ -115,7 +115,7 @@ func cliente(seguimiento int, conn *grpc.ClientConn) {
 
 		cliente := pedido.NewInteraccionesClient(conn)
 
-		response, err := cliente.Estado_encargo(context.Background(), &pedido.Producto{
+		response, err := cliente.EstadoEncargo(context.Background(), &pedido.Producto{
 			ID: seguimiento,
 		})
 		if err != nil {

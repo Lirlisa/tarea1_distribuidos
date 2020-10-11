@@ -2,7 +2,7 @@ syntax="proto3";
 
 package ClienteLogistica;
 
-option go_package = "../ClienteLogistica";
+option go_package = ".;ClienteLogistica";
 
 message Estatus {
     int32 Valor = 1;
@@ -22,5 +22,5 @@ message Encargo {
 
 service Interacciones {
     rpc Encargar (Encargo) returns (Producto) {}
-    rpc Estado_encargo (Producto) returns (Estatus) {}
+    rpc EstadoEncargo (Producto) returns (Estatus) {}
 }
