@@ -124,7 +124,7 @@ func cliente(seguimiento int, conn *grpc.ClientConn) {
 			log.Fatalf("Error al consultar estado: %s", err)
 		}
 
-		//////////////////IMPRIMIR RESPUESTA/////////////////////////////////////////////////
+		fmt.Printf("ESTADO PEDIDO:%d,%s", seguimiento, response.Valor)
 
 	}
 
