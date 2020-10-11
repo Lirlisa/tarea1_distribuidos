@@ -2,13 +2,10 @@ syntax="proto3";
 
 package pedido;
 
-option go_package = "logistica/pedido";
+option go_package = ".;pedido";
 
 message Estatus {
-    int32 OK = 1;
-    int32 PERDIDO = 2;
-    int32 EN_CAMINO = 3;
-    int32 ERROR = 4;
+    int32 Valor = 1;
 }
 
 message Producto {

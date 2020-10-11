@@ -26,6 +26,7 @@ var seguimientoAId = make(map[int]uint32)
 
 type Server struct {
 	//server
+	placeholder int
 }
 
 func (s *Server) Encargar(ctx context.Context, in *Encargo) (*Producto, error) {

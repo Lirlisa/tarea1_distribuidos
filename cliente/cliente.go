@@ -13,8 +13,6 @@ import (
 
 	"./pedido"
 	"google.golang.org/grpc"
-
-	"sync"
 )
 
 var wait sync.WaitGroup
@@ -61,7 +59,7 @@ func recibir(archivo string, tienda int, conn *grpc.ClientConn) {
 	if err != nil {
 		fmt.Println("Error", err)
 	}
-
+	var aux1 int
 	for value := range record { // for i:=0; i<len(record)
 		if value != 0 {
 
@@ -77,11 +75,11 @@ func recibir(archivo string, tienda int, conn *grpc.ClientConn) {
 			}
 
 			cliente := pedido.NewInteraccionesClient(conn)
-
+			aux1, _ = strconv.Atoi(record[value][2])
 			response, err := cliente.Encargar(context.Background(), &pedido.Encargo{
 				TipoLocal:      tipo,
 				NombreProducto: record[value][1],
-				Valor:          strconv.Atoi(record[value][2]),
+				Valor:          uint32(aux1),
 				Origen:         record[value][3],
 				Destino:        record[value][4],
 			})
@@ -90,10 +88,10 @@ func recibir(archivo string, tienda int, conn *grpc.ClientConn) {
 			}
 
 			if tienda == 2 {
-				var seguimiento int
+				var seguimiento uint32
 				seguimiento = response.ID
 				wait.Add(1)
-				go cliente(seguimiento, conn)
+				cliente(seguimiento, conn)
 			}
 
 			time.Sleep(time.Second * time.Duration(tiempo))
