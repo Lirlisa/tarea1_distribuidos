@@ -42,13 +42,13 @@ func main() {
 	}
 
 	if tienda == 1 {
-		recibir("retail.csv", tienda)
+		recibir("retail.csv", tienda, conn)
 	} else {
-		recibir("pymes.csv", tienda)
+		recibir("pymes.csv", tienda, conn)
 	}
 }
 
-func recibir(archivo string, tienda int) {
+func recibir(archivo string, tienda int, conn *grpc.ClientConn) {
 	file, err := os.Open(archivo)
 	if err != nil {
 		fmt.Println("Error", err)
@@ -68,12 +68,12 @@ func recibir(archivo string, tienda int) {
 			var tipo string
 			if tienda == 2 {
 				if record[value][5] == "1" {
-					datos[0] = "prioritario"
+					tipo = "prioritario"
 				} else {
-					datos[0] = "normal"
+					tipo = "normal"
 				}
 			} else {
-				datos[0] = "retail"
+				tipo = "retail"
 			}
 
 			cliente := pedido.NewInteraccionesClient(conn)
@@ -88,10 +88,14 @@ func recibir(archivo string, tienda int) {
 			if err != nil {
 				log.Fatalf("Error al Encargar: %s", err)
 			}
-			log.Printf("Response from server: %s", response.TipoLocal)
 
-			wait.Add(1)
-			go cliente(datos, tienda)
+			if tienda == 2 {
+				var seguimiento int
+				seguimiento = response.ID
+				wait.Add(1)
+				go cliente(seguimiento, conn)
+			}
+
 			time.Sleep(time.Second * time.Duration(tiempo))
 
 		}
@@ -100,17 +104,29 @@ func recibir(archivo string, tienda int) {
 
 }
 
-func cliente(datos [5]string, tienda int) {
+func cliente(seguimiento int, conn *grpc.ClientConn) {
 	var consulta int
-	if tienda == 2 {
-		for {
-			consulta = rand.Intn(100)
-			if consulta <= 40 {
-				break
-			}
-			time.Sleep(time.Second * 5)
-			fmt.Println("QUIERO CONSULTAR POR MI PEDIDO:", datos[1])
+
+	for {
+		consulta = rand.Intn(100)
+		if consulta <= 40 { ////////////////////////////////////
+			break
 		}
+		time.Sleep(time.Second * 5) /////////////////////////////
+		fmt.Println("QUIERO CONSULTAR POR MI PEDIDO: %d", seguimiento)
+
+		cliente := pedido.NewInteraccionesClient(conn)
+
+		response, err := cliente.Estado_encargo(context.Background(), &pedido.Producto{
+			ID: seguimiento,
+		})
+		if err != nil {
+			log.Fatalf("Error al consultar estado: %s", err)
+		}
+
+		//////////////////IMPRIMIR RESPUESTA/////////////////////////////////////////////////
+
 	}
+
 	wait.Done()
 }
