@@ -2,11 +2,13 @@ syntax="proto3";
 
 package pedido;
 
-enum Estatus {
-    OK = 0;
-    PERDIDO = 1;
-    EN_CAMINO = 2;
-    ERROR = 3;
+option go_package = "logistica/pedido";
+
+message Estatus {
+    int32 OK = 1;
+    int32 PERDIDO = 2;
+    int32 EN_CAMINO = 3;
+    int32 ERROR = 4;
 }
 
 message Producto {
@@ -14,14 +16,14 @@ message Producto {
 }
 
 message Encargo {
-    string tipo_local = 1;
-    string nombre_producto = 2;
-    uint32 valor = 3;
-    string origen = 4;
-    string destino = 5;
+    string TipoLocal = 1;
+    string NombreProducto = 2;
+    uint32 Valor = 3;
+    string Origen = 4;
+    string Destino = 5;
 }
 
 service Interacciones {
-    rpc Encargar (Encargo) returns (Encargo) {}
-    rpc Estado_encargo (Producto) returns (Producto) {}
+    rpc Encargar (Encargo) returns (Producto) {}
+    rpc Estado_encargo (Producto) returns (Estatus) {}
 }
