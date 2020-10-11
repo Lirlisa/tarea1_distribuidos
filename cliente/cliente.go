@@ -74,9 +74,9 @@ func recibir(archivo string, tienda int, conn *grpc.ClientConn) {
 				tipo = "retail"
 			}
 
-			cliente_ := pedido.NewInteraccionesClient(conn)
+			cliente1 := pedido.NewInteraccionesClient(conn)
 			aux1, _ = strconv.Atoi(record[value][2])
-			response, err := cliente_.Encargar(context.Background(), &pedido.Encargo{
+			response, err := cliente1.Encargar(context.Background(), &pedido.Encargo{
 				TipoLocal:      tipo,
 				NombreProducto: record[value][1],
 				Valor:          uint32(aux1),
