@@ -1,0 +1,29 @@
+syntax="proto3";
+
+package CamionLogistica;
+
+option go_package = ".;CamionLogistica";
+
+message Estatus {
+    int32 Valor = 1;
+}
+
+message Paquete {
+    uint32 IDPaquete = 1;
+    uint32 Seguimiento = 2;
+    string Tipo = 3;
+    uint32 Valor = 4;
+    uint32 Intentos = 5;
+    uint32 Estado = 6;
+}
+
+message Tipo {
+    uint32 clase = 1;//1: retail, 2: normal
+}
+
+service Interacciones {
+    rpc PedirPaquete (Tipo) returns (Paquete) {}// el tipo debe corresponer al tipo de camión
+    //logistica se encargará de, por ejemplo, si es un camión de retail, pero no hay nada en cola de retail,
+    //entonces le pasará un paquete prioritario
+    rpc DevolverPaquete (Paquete) returns (Paquete) {} //devuelve el mismo paquete, es que no puede tener ningún return
+}

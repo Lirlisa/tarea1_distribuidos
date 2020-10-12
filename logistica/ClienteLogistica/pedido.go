@@ -5,6 +5,7 @@ import (
 	"math/rand"
 	"time"
 
+	"../Estructuras"
 	"golang.org/x/net/context"
 )
 
@@ -24,14 +25,14 @@ type registro struct {
 var tabla = make(map[uint32]registro)
 var seguimientoAId = make(map[int]uint32)
 
-type Server struct {
+type ServerCliente struct {
 	//server
 	placeholder int
 }
 
-func (s *Server) Encargar(ctx context.Context, in *Encargo) (*Producto, error) {
-	idReservada := id_disponible
+func (s *ServerCliente) Encargar(ctx context.Context, in *Encargo) (*Producto, error) {
 	id_disponible++
+	idReservada := id_disponible
 
 	log.Printf("Se ha recibido encargo: %s", in.TipoLocal)
 	test := rand.Int()
@@ -48,11 +49,31 @@ func (s *Server) Encargar(ctx context.Context, in *Encargo) (*Producto, error) {
 		in.GetDestino(),
 		test,
 	}
+
+	pack := Estructuras.Paquete{
+		idReservada,
+		uint32(test),
+		in.GetTipoLocal(),
+		in.GetValor(),
+		0,
+		2,
+	}
+	Estructuras.Paquetes[idReservada] = &pack
+
+	switch x := in.GetTipoLocal(); x {
+	case "retail":
+		Estructuras.ColaRetail = append(Estructuras.ColaRetail, pack)
+	case "prioritario":
+		Estructuras.ColaPrioridad = append(Estructuras.ColaPrioridad, pack)
+	case "normal":
+		Estructuras.ColaNormal = append(Estructuras.ColaNormal, pack)
+	}
+
 	seguimientoAId[test] = idReservada
 	return &Producto{ID: idReservada}, nil
 
 }
-func (s *Server) EstadoEncargo(ctx context.Context, in *Producto) (*Estatus, error) {
+func (s *ServerCliente) EstadoEncargo(ctx context.Context, in *Producto) (*Estatus, error) {
 	log.Printf("Solicitado estado de %s", in.ID)
 	return &Estatus{Valor: 1}, nil
 }
