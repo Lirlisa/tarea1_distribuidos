@@ -1,8 +1,8 @@
 syntax="proto3";
 
-package pedido;
+package ClienteLogistica;
 
-option go_package = ".;pedido";
+option go_package = "../ClienteLogistica";
 
 message Estatus {
     int32 Valor = 1;
