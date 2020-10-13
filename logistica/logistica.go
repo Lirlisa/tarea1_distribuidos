@@ -27,7 +27,7 @@ func main() {
 
 	fmt.Println("Iniciado servidor en escucha en puerto 9000")
 
-	wait.Add(1)
+	wait.Add(2)
 	go func() {
 		escuchar_cliente(listenerCliente)
 		wait.Done()

@@ -91,7 +91,7 @@ func recibir(archivo string, tienda int, conn *grpc.ClientConn) {
 				var seguimiento uint32
 				seguimiento = response.ID
 				wait.Add(1)
-				cliente(seguimiento, conn)
+				go cliente(seguimiento, conn)
 			}
 
 			time.Sleep(time.Second * time.Duration(tiempo))
@@ -111,7 +111,7 @@ func cliente(seguimiento uint32, conn *grpc.ClientConn) {
 			break
 		}
 		time.Sleep(time.Second * 5) /////////////////////////////
-		fmt.Println("QUIERO CONSULTAR POR MI PEDIDO: %d", seguimiento)
+		fmt.Printf("QUIERO CONSULTAR POR MI PEDIDO: %d\n", seguimiento)
 
 		cliente := pedido.NewInteraccionesClient(conn)
 
@@ -122,7 +122,7 @@ func cliente(seguimiento uint32, conn *grpc.ClientConn) {
 			log.Fatalf("Error al consultar estado: %s", err)
 		}
 
-		fmt.Printf("ESTADO PEDIDO:%d,%s", seguimiento, response.Valor)
+		fmt.Printf("EL ESTADO PEDIDO:%d ES %d\n", seguimiento, response.Valor)
 
 	}
 
