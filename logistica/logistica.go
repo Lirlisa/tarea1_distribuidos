@@ -28,13 +28,14 @@ func main() {
 
 	wait.Add(2)
 	go func() {
-		escuchar_cliente(listener)
-		wait.Done()
-	}()
-	go func() {
 		escuchar_camion(listener)
 		wait.Done()
 	}()
+	go func() {
+		escuchar_cliente(listener)
+		wait.Done()
+	}()
+
 	wait.Wait()
 }
 

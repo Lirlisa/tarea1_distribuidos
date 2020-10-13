@@ -11,7 +11,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/Lirlisa/tarea1_distribuidos/cliente/ClienteLogistica"
+	"./pedido"
 	"google.golang.org/grpc"
 )
 
@@ -74,9 +74,9 @@ func recibir(archivo string, tienda int, conn *grpc.ClientConn) {
 				tipo = "retail"
 			}
 
-			cliente1 := ClienteLogistica.NewInteraccionesClient(conn)
+			cliente1 := pedido.NewInteraccionesClient(conn)
 			aux1, _ = strconv.Atoi(record[value][2])
-			response, err := cliente1.Encargar(context.Background(), &ClienteLogistica.Encargo{
+			response, err := cliente1.Encargar(context.Background(), &pedido.Encargo{
 				TipoLocal:      tipo,
 				NombreProducto: record[value][1],
 				Valor:          uint32(aux1),
@@ -91,7 +91,7 @@ func recibir(archivo string, tienda int, conn *grpc.ClientConn) {
 				var seguimiento uint32
 				seguimiento = response.ID
 				wait.Add(1)
-				cliente(seguimiento, conn)
+				go cliente(seguimiento, conn)
 			}
 
 			time.Sleep(time.Second * time.Duration(tiempo))
@@ -113,9 +113,9 @@ func cliente(seguimiento uint32, conn *grpc.ClientConn) {
 		time.Sleep(time.Second * 5) /////////////////////////////
 		fmt.Println("QUIERO CONSULTAR POR MI PEDIDO: %d", seguimiento)
 
-		cliente := ClienteLogistica.NewInteraccionesClient(conn)
+		cliente := pedido.NewInteraccionesClient(conn)
 
-		response, err := cliente.EstadoEncargo(context.Background(), &ClienteLogistica.Producto{
+		response, err := cliente.EstadoEncargo(context.Background(), &pedido.Producto{
 			ID: seguimiento,
 		})
 		if err != nil {
