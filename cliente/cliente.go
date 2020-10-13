@@ -11,7 +11,7 @@ import (
 	"sync"
 	"time"
 
-	"./ClienteLogistica"
+	"github.com/Lirlisa/tarea1_distribuidos/cliente/ClienteLogistica"
 	"google.golang.org/grpc"
 )
 
