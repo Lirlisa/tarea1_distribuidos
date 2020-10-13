@@ -19,20 +19,21 @@ func main() {
 	//setear seed para los números de seguimiento
 	rand.Seed(time.Now().UnixNano())
 
-	listener, err := net.Listen("tcp", ":9000")
+	listenerCliente, err := net.Listen("tcp", ":9000")
+	listenerCamion, err := net.Listen("tcp", ":9001")
 	if err != nil {
 		log.Fatalf("Se ha producido un error: %s", err)
 	}
 
 	fmt.Println("Iniciado servidor en escucha en puerto 9000")
 
-	wait.Add(2)
+	wait.Add(1)
 	go func() {
-		escuchar_cliente(listener)
+		escuchar_cliente(listenerCliente)
 		wait.Done()
 	}()
 	go func() {
-		escuchar_camion(listener)
+		escuchar_camion(listenerCamion)
 		wait.Done()
 	}()
 	wait.Wait()
