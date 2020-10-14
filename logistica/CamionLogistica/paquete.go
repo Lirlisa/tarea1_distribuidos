@@ -1,9 +1,10 @@
 package CamionLogistica
 
 import (
-	"golang.org/x/net/context"
 	"log"
+
 	"../Estructuras"
+	"golang.org/x/net/context"
 )
 
 type ServerCamion struct {
@@ -11,7 +12,13 @@ type ServerCamion struct {
 }
 
 func (c *ServerCamion) PedirPaquete(ctx context.Context, in *Tipo) (*Paquete, error) {
-	log.Printf("Pedido de paquete de tipo %s", in.getTipo()==1?"Retail":"Normal")
+	var a string
+	if in.getTipo() == 1 {
+		a = "Retail"
+	} else {
+		a = "Normal"
+	}
+	log.Printf("Pedido de paquete de tipo %s", a)
 	elem := new(Estructuras.Paquete)
 
 	if x := in.GetClase(); x == (1) {
