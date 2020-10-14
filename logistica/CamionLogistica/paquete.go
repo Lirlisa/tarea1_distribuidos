@@ -13,7 +13,7 @@ type ServerCamion struct {
 
 func (c *ServerCamion) PedirPaquete(ctx context.Context, in *Tipo) (*Paquete, error) {
 	var a string
-	if in.getTipo() == 1 {
+	if in.GetTipo() == 1 {
 		a = "Retail"
 	} else {
 		a = "Normal"
