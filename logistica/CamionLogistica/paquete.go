@@ -2,7 +2,7 @@ package CamionLogistica
 
 import (
 	"golang.org/x/net/context"
-
+	"log"
 	"../Estructuras"
 )
 
@@ -11,7 +11,8 @@ type ServerCamion struct {
 }
 
 func (c *ServerCamion) PedirPaquete(ctx context.Context, in *Tipo) (*Paquete, error) {
-	var elem *Estructuras.Paquete
+	log.Printf("Pedido de paquete de tipo %s", in.getTipo()==1?"Retail":"Normal")
+	elem := new(Estructuras.Paquete)
 
 	if x := in.GetClase(); x == (1) {
 		if len(Estructuras.ColaRetail) > 0 {
