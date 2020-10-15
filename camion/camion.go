@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"math/rand"
+	"os"
 	"sync"
 	"time"
 
@@ -57,6 +58,20 @@ func camion(tipo uint32, conn *grpc.ClientConn, vehiculo int) {
 	var ind2 int
 
 	c := CamionLogistica.NewInteraccionesClient(conn)
+
+	var archivo string
+
+	archivo = "camion1.txt"
+	if vehiculo == 2 {
+		archivo = "camion2.txt"
+	} else if vehiculo == 3 {
+		archivo = "camion3.txt"
+	}
+
+	file, err := os.Create(archivo)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	for {
 		var envio1 paquete
@@ -136,6 +151,7 @@ func camion(tipo uint32, conn *grpc.ClientConn, vehiculo int) {
 
 		if envio1.ID != 0 {
 			registro[ind1] = envio1
+			file.WriteString(fmt.Sprint(envio1.ID) + " " + envio1.tipo + " " + fmt.Sprint(envio1.valor) + " " + envio1.origen + " " + envio1.destino + " " + fmt.Sprint(envio1.intentos) + " " + envio1.fentrega + "\n")
 			var entrega uint32
 			if envio1.fentrega == "0" {
 				entrega = 3
@@ -159,6 +175,7 @@ func camion(tipo uint32, conn *grpc.ClientConn, vehiculo int) {
 		}
 		if envio2.ID != 0 {
 			registro[ind2] = envio2
+			file.WriteString(fmt.Sprint(envio2.ID) + " " + envio2.tipo + " " + fmt.Sprint(envio2.valor) + " " + envio2.origen + " " + envio2.destino + " " + fmt.Sprint(envio2.intentos) + " " + envio2.fentrega + "\n")
 			var entrega uint32
 			if envio2.fentrega == "0" {
 				entrega = 3
