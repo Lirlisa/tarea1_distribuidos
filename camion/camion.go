@@ -24,13 +24,15 @@ type paquete struct {
 }
 
 var tiempo int
+var tiempoEntrega int
 var wait sync.WaitGroup
 
 func main() {
 	rand.Seed(time.Now().UnixNano())
 	fmt.Println("Tiempo de espera de los camiones (En segundos):")
 	fmt.Scanln(&tiempo)
-	fmt.Printf("Tiempo:%d\n", tiempo)
+	fmt.Println("Tiempo que tardan en entregar los camiones (En segundos):")
+	fmt.Scanln(&tiempoEntrega)
 
 	var conn *grpc.ClientConn
 	conn, err := grpc.Dial(":9001", grpc.WithInsecure())
@@ -188,12 +190,14 @@ func reparto(envio1 paquete, envio2 paquete) (paquete, paquete) { /////simulaci√
 	var break2 int
 	intento1, break1 = cantintentos(envio1)
 	intento2, break2 = cantintentos(envio2)
+	time.Sleep(time.Second * time.Duration(tiempoEntrega))
 	for {
 		if envio1.valor == 0 || envio1.fentrega != "0" || break1 == 1 { /////intenta entregar primer pedido
 			break1 = 1
 		} else {
 			envio1, break1 = entrega(envio1, intento1)
 		}
+		time.Sleep(time.Second * time.Duration(tiempoEntrega))
 		if envio2.valor == 0 || envio2.fentrega != "0" || break2 == 1 { /////intenta entregar segundo pedido
 			break2 = 1
 		} else {
@@ -202,7 +206,7 @@ func reparto(envio1 paquete, envio2 paquete) (paquete, paquete) { /////simulaci√
 		if break1 == 1 && break2 == 1 { ////si se entregan ambos o rompe condiciones vuelve
 			break
 		}
-		time.Sleep(time.Second * 5) /////////////////////////////////////////////////////7
+		time.Sleep(time.Second * time.Duration(tiempoEntrega))
 	}
 	return envio1, envio2
 }
