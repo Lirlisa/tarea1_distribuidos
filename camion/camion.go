@@ -79,8 +79,8 @@ func camion(tipo uint32, conn *grpc.ClientConn, vehiculo int) {
 					envio1.ID = response.IDPaquete
 					envio1.tipo = response.Tipo
 					envio1.valor = response.Valor
-					/*envio1.origen
-					envio1.destino*/
+					envio1.origen = response.Origen
+					envio1.destino = response.Destino
 					envio1.intentos = 0
 					envio1.fentrega = "0"
 					envio1.seguimiento = response.Seguimiento
@@ -105,8 +105,8 @@ func camion(tipo uint32, conn *grpc.ClientConn, vehiculo int) {
 			envio2.ID = response.IDPaquete
 			envio2.tipo = response.Tipo
 			envio2.valor = response.Valor
-			/*envio1.origen
-			envio1.destino*/
+			envio2.origen = response.Origen
+			envio2.destino = response.Destino
 			envio2.intentos = 0
 			envio2.fentrega = "0"
 			envio2.seguimiento = response.Seguimiento
@@ -146,7 +146,9 @@ func camion(tipo uint32, conn *grpc.ClientConn, vehiculo int) {
 				Tipo:        envio1.tipo,
 				Valor:       envio1.valor,
 				Intentos:    envio1.intentos,
-				Estado:      entrega})
+				Estado:      entrega,
+				Origen:      envio1.origen,
+				Destino:     envio1.destino})
 			if err != nil {
 				log.Fatalf("Error al pedir paquete: %s", err)
 			}
@@ -167,7 +169,9 @@ func camion(tipo uint32, conn *grpc.ClientConn, vehiculo int) {
 				Tipo:        envio2.tipo,
 				Valor:       envio2.valor,
 				Intentos:    envio2.intentos,
-				Estado:      entrega})
+				Estado:      entrega,
+				Origen:      envio2.origen,
+				Destino:     envio2.destino})
 			if err != nil {
 				log.Fatalf("Error al pedir paquete: %s", err)
 			}

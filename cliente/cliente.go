@@ -104,6 +104,7 @@ func recibir(archivo string, tienda int, conn *grpc.ClientConn) {
 
 func cliente(seguimiento uint32, conn *grpc.ClientConn) {
 	var consulta int
+	var estado string
 
 	for {
 		consulta = rand.Intn(100)
@@ -121,10 +122,21 @@ func cliente(seguimiento uint32, conn *grpc.ClientConn) {
 		if err != nil {
 			log.Fatalf("Error al consultar estado: %s", err)
 		}
-
-		fmt.Printf("EL ESTADO PEDIDO:%d ES %d\n", seguimiento, response.Valor)
+		estado = estadoPedido(response.Valor)
+		fmt.Printf("EL ESTADO DEL PEDIDO:%d ES %s\n", seguimiento, estado)
 
 	}
 
 	wait.Done()
+}
+
+func estadoPedido(valor int32) string {
+	if valor == 0 {
+		return "EN BODEGA"
+	} else if valor == 1 {
+		return "EN CAMINO"
+	} else if valor == 2 {
+		return "RECIBIDO"
+	}
+	return "NO RECIBIDO"
 }
