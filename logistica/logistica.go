@@ -19,10 +19,13 @@ func main() {
 	//setear seed para los números de seguimiento
 	rand.Seed(time.Now().UnixNano())
 
-	listenerCliente, err := net.Listen("tcp", ":9000")
-	listenerCamion, err := net.Listen("tcp", ":9001")
-	if err != nil {
-		log.Fatalf("Se ha producido un error: %s", err)
+	listenerCliente, err1 := net.Listen("tcp", ":9000")
+	listenerCamion, err2 := net.Listen("tcp", ":9001")
+	if err1 != nil {
+		log.Fatalf("Se ha producido un error: %s", err1)
+	}
+	if err2 != nil {
+		log.Fatalf("Se ha producido un error: %s", err2)
 	}
 
 	fmt.Println("Iniciado servidor en escucha en puerto 9000")

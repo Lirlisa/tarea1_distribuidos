@@ -3,6 +3,7 @@ package ClienteLogistica
 import (
 	"log"
 	"math/rand"
+	"sync"
 	"time"
 
 	"../Estructuras"
@@ -11,35 +12,27 @@ import (
 
 var id_disponible uint32
 
-type registro struct {
-	timestamp   time.Time
-	id          uint32
-	tipo        string
-	nombre      string
-	valor       uint32
-	origen      string
-	destino     string
-	seguimiento int
-}
-
-var tabla = make(map[uint32]registro)
-var seguimientoAId = make(map[int]uint32)
-
 type ServerCliente struct {
 	//server
 	placeholder int
 }
 
 func (s *ServerCliente) Encargar(ctx context.Context, in *Encargo) (*Producto, error) {
+	log.Printf("Se ha recibido encargo: %s", in.TipoLocal)
+	var candado sync.Mutex
+	candado.Lock()
 	id_disponible++
 	idReservada := id_disponible
 
-	log.Printf("Se ha recibido encargo: %s", in.TipoLocal)
-	test := rand.Int()
-	for _, existe := seguimientoAId[test]; existe; _, existe = seguimientoAId[test] {
-		test = rand.Int()
+	test := rand.Uint32()
+	for _, existe := Estructuras.SeguimientoAId[test]; existe; _, existe = Estructuras.SeguimientoAId[test] {
+		test = rand.Uint32()
 	}
-	tabla[idReservada] = registro{
+	Estructuras.SeguimientoAId[test] = idReservada
+	candado.Unlock()
+
+	nuevoRegistro := new(Estructuras.Registro)
+	*nuevoRegistro = Estructuras.Registro{
 		time.Now(),
 		idReservada,
 		in.GetTipoLocal(),
@@ -47,8 +40,9 @@ func (s *ServerCliente) Encargar(ctx context.Context, in *Encargo) (*Producto, e
 		in.GetValor(),
 		in.GetOrigen(),
 		in.GetDestino(),
-		test,
+		int32(test),
 	}
+	Estructuras.Tabla[idReservada] = nuevoRegistro
 
 	pack := Estructuras.Paquete{
 		idReservada,
@@ -62,18 +56,27 @@ func (s *ServerCliente) Encargar(ctx context.Context, in *Encargo) (*Producto, e
 
 	switch x := in.GetTipoLocal(); x {
 	case "retail":
+		candado.Lock()
 		Estructuras.ColaRetail = append(Estructuras.ColaRetail, pack)
+		candado.Unlock()
 	case "prioritario":
+		candado.Lock()
 		Estructuras.ColaPrioridad = append(Estructuras.ColaPrioridad, pack)
+		candado.Unlock()
 	case "normal":
+		candado.Lock()
 		Estructuras.ColaNormal = append(Estructuras.ColaNormal, pack)
+		candado.Unlock()
 	}
 
-	seguimientoAId[test] = idReservada
-	return &Producto{ID: idReservada}, nil
+	return &Producto{ID: test}, nil
 
 }
 func (s *ServerCliente) EstadoEncargo(ctx context.Context, in *Producto) (*Estatus, error) {
-	log.Printf("Solicitado estado de %s", in.ID)
-	return &Estatus{Valor: 1}, nil
+	log.Printf("Solicitado estado de %d", in.ID)
+
+	if valor, existencia := Estructuras.Paquetes[Estructuras.SeguimientoAId[in.ID]]; existencia {
+		return &Estatus{Valor: int32(valor.Estado)}, nil
+	}
+	return &Estatus{Valor: 4}, nil //el extraño caso en que no exista el paquete
 }
