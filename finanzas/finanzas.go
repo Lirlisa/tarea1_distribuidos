@@ -12,6 +12,11 @@ func failOnError(err error, msg string) {
 	}
 }
 
+var ganancias int
+var perdidas int
+var total int 
+
+
 func main() {
 	conn, err := amqp.Dial("amqp://admin:password@localhost:5672/")
 	failOnError(err, "Failed to connect to RabbitMQ")
@@ -20,7 +25,7 @@ func main() {
 
 }
 
-/*
+
 	ch, err := conn.Channel()
 	failOnError(err, "Failed to open a channel")
 	defer ch.Close()
@@ -56,4 +61,4 @@ func main() {
 	log.Printf(" [*] Waiting for messages. To exit press CTRL+C")
 	<-forever
 }
-*/
+

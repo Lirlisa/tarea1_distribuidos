@@ -237,6 +237,13 @@ func reparto(envio1 paquete, envio2 paquete) (paquete, paquete) { /////simulaci√
 }
 
 func entrega(envio paquete, intentos uint32) (paquete, int) { /// revisar condiciones para realizar entrega, retorna 1 si no se puede entregar
+
+	if envio.tipo == "retail" {
+		if envio.intentos < intentos && envio.fentrega == "0" {
+			return probentregar(envio), 0
+		}
+		return envio, 1
+	}
 	if envio.valor > 10*envio.intentos && envio.intentos < intentos && envio.fentrega == "0" {
 		return probentregar(envio), 0
 	}
