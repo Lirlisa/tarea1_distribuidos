@@ -197,6 +197,14 @@ func camion(tipo uint32, conn *grpc.ClientConn, vehiculo int) {
 			fmt.Printf("Entregada información pedido: %d\n", response.IDPaquete)
 
 		}
+		if tipo == 1 || tipo == 3 {
+			if envio1.tipo == "retail" || envio2.tipo == "retail" {
+				tipo = 3
+			} else {
+				tipo = 1
+			}
+		}
+
 	}
 }
 
