@@ -19,7 +19,10 @@ var wait sync.WaitGroup
 var tiempo int
 
 func main() {
+	//semilla para aleatoriedad
+	rand.Seed(time.Now().UnixNano())
 
+	//Se establece comunicación
 	var conn *grpc.ClientConn
 	conn, err := grpc.Dial(":9000", grpc.WithInsecure())
 	if err != nil {
@@ -27,7 +30,7 @@ func main() {
 	}
 	defer conn.Close()
 
-	/*#######################################################*/
+	//Solicitud tiempo entre ordenes
 	var tienda int
 	fmt.Println("Tiempo de espera entre envio de ordenes (En segundos):")
 	fmt.Scanln(&tiempo)
@@ -39,6 +42,7 @@ func main() {
 		}
 	}
 
+	//Se ejecuta según corresponda
 	if tienda == 1 {
 		recibir("retail.csv", tienda, conn)
 	} else {
@@ -46,7 +50,10 @@ func main() {
 	}
 }
 
+//Lee el archivo correspondiente, se realizan las oredenes correspondientes y se llama a la función encargada de realizar las consultas
 func recibir(archivo string, tienda int, conn *grpc.ClientConn) {
+
+	//Se abre el archivo
 	file, err := os.Open(archivo)
 	if err != nil {
 		fmt.Println("Error", err)
@@ -54,15 +61,19 @@ func recibir(archivo string, tienda int, conn *grpc.ClientConn) {
 	}
 	defer file.Close()
 
+	//Se lee el archivo
 	reader := csv.NewReader(file)
 	record, err := reader.ReadAll()
 	if err != nil {
 		fmt.Println("Error", err)
 	}
 	var aux1 int
+
+	//iteramos por los datos
 	for value := range record { // for i:=0; i<len(record)
 		if value != 0 {
 
+			//Establece el tipo de envío
 			var tipo string
 			if tienda == 2 {
 				if record[value][5] == "1" {
@@ -74,6 +85,7 @@ func recibir(archivo string, tienda int, conn *grpc.ClientConn) {
 				tipo = "retail"
 			}
 
+			//Se envía el pedido
 			cliente1 := pedido.NewInteraccionesClient(conn)
 			aux1, _ = strconv.Atoi(record[value][2])
 			response, err := cliente1.Encargar(context.Background(), &pedido.Encargo{
@@ -87,6 +99,7 @@ func recibir(archivo string, tienda int, conn *grpc.ClientConn) {
 				log.Fatalf("Error al Encargar: %s", err)
 			}
 
+			//Si la tienda es pyme se llama a la función encargada de realizar consultas de estado
 			if tienda == 2 {
 				var seguimiento uint32
 				seguimiento = response.ID
@@ -94,6 +107,7 @@ func recibir(archivo string, tienda int, conn *grpc.ClientConn) {
 				go cliente(seguimiento, conn)
 			}
 
+			//Se espera el tiempo especificado entre pedidos
 			time.Sleep(time.Second * time.Duration(tiempo))
 
 		}
@@ -102,16 +116,19 @@ func recibir(archivo string, tienda int, conn *grpc.ClientConn) {
 
 }
 
+//realiza consultas de estado, si en alguna iteración no realiza consultas entonces deja de hacerlo.
 func cliente(seguimiento uint32, conn *grpc.ClientConn) {
 	var consulta int
 	var estado string
 
 	for {
 		consulta = rand.Intn(100)
-		if consulta <= 40 { ////////////////////////////////////
+		// 60% de probabilidad de realizar consultas
+		if consulta < 40 { //////////////////////////////////////VALOR MODIFICABLE
 			break
 		}
-		time.Sleep(time.Second * 5) /////////////////////////////
+		//Se realiza consulta
+		time.Sleep(time.Second * 5) /////////////////////////////VALOR MODIFICABLE
 		fmt.Printf("QUIERO CONSULTAR POR MI PEDIDO: %d\n", seguimiento)
 
 		cliente := pedido.NewInteraccionesClient(conn)
@@ -122,6 +139,7 @@ func cliente(seguimiento uint32, conn *grpc.ClientConn) {
 		if err != nil {
 			log.Fatalf("Error al consultar estado: %s", err)
 		}
+		// Mapeo estado edido
 		estado = estadoPedido(response.Valor)
 		fmt.Printf("EL ESTADO DEL PEDIDO:%d ES %s\n", seguimiento, estado)
 
@@ -130,6 +148,7 @@ func cliente(seguimiento uint32, conn *grpc.ClientConn) {
 	wait.Done()
 }
 
+// Mapea el valor, da un significado a la respuesta
 func estadoPedido(valor int32) string {
 	if valor == 0 {
 		return "EN BODEGA"
