@@ -50,7 +50,7 @@ func (s *ServerCliente) Encargar(ctx context.Context, in *Encargo) (*Producto, e
 		in.GetTipoLocal(),
 		in.GetValor(),
 		0,
-		2,
+		0,
 	}
 	Estructuras.Paquetes[idReservada] = &pack
 

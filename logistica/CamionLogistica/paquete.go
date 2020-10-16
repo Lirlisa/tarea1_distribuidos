@@ -24,25 +24,29 @@ func (c *ServerCamion) PedirPaquete(ctx context.Context, in *Tipo) (*Paquete, er
 	log.Printf("Pedido de paquete de tipo %s", a)
 	elem := new(Estructuras.Paquete)
 
-	if x := in.GetClase(); x == (1) {
+	if x := in.GetClase(); x == 1 {
+		candado.Lock()
 		if len(Estructuras.ColaRetail) > 0 {
-			candado.Lock()
 			*elem = Estructuras.ColaRetail[0]
 			Estructuras.ColaRetail = Estructuras.ColaRetail[1:]
 			Estructuras.Paquetes[elem.IDPaquete].Estado = 1
-			candado.Unlock()
 		} else if len(Estructuras.ColaPrioridad) > 0 {
-			candado.Lock()
 			*elem = Estructuras.ColaPrioridad[0]
 			Estructuras.ColaPrioridad = Estructuras.ColaPrioridad[1:]
 			Estructuras.Paquetes[elem.IDPaquete].Estado = 1
-			candado.Unlock()
 		}
-	} else if len(Estructuras.ColaNormal) > 0 {
+		candado.Unlock()
+	} else {
 		candado.Lock()
-		*elem = Estructuras.ColaNormal[0]
-		Estructuras.ColaNormal = Estructuras.ColaNormal[1:]
-		Estructuras.Paquetes[elem.IDPaquete].Estado = 1
+		if len(Estructuras.ColaPrioridad) > 0 {
+			*elem = Estructuras.ColaPrioridad[0]
+			Estructuras.ColaPrioridad = Estructuras.ColaPrioridad[1:]
+			Estructuras.Paquetes[elem.IDPaquete].Estado = 1
+		} else if len(Estructuras.ColaNormal) > 0 {
+			*elem = Estructuras.ColaNormal[0]
+			Estructuras.ColaNormal = Estructuras.ColaNormal[1:]
+			Estructuras.Paquetes[elem.IDPaquete].Estado = 1
+		}
 		candado.Unlock()
 	}
 
