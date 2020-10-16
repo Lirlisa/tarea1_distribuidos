@@ -33,22 +33,22 @@ func main() {
 
 	wait.Add(3)
 	go func() {
-		escuchar_cliente(listenerCliente)
+		escucharCliente(listenerCliente)
 		wait.Done()
 	}()
 	go func() {
-		escuchar_camion(listenerCamion)
+		escucharCamion(listenerCamion)
 		wait.Done()
 	}()
-	go func() {
-		conectar_finanas()
+	/*go func() {
+		conectarFinanzas()
 		wait.Done()
-	}()
+	}()*/
 
 	wait.Wait()
 }
 
-func escuchar_cliente(listener net.Listener) {
+func escucharCliente(listener net.Listener) {
 	servidorCliente := ClienteLogistica.ServerCliente{}
 	grpcServer := grpc.NewServer()
 	ClienteLogistica.RegisterInteraccionesServer(grpcServer, &servidorCliente)
@@ -58,7 +58,7 @@ func escuchar_cliente(listener net.Listener) {
 	}
 }
 
-func escuchar_camion(listener net.Listener) {
+func escucharCamion(listener net.Listener) {
 	servidorCamion := CamionLogistica.ServerCamion{}
 	grpcServer := grpc.NewServer()
 	CamionLogistica.RegisterInteraccionesServer(grpcServer, &servidorCamion)
@@ -74,7 +74,7 @@ func failOnError(err error, msg string) {
 	}
 }
 
-func conectar_finanas() {
+func conectarFinanzas() {
 	conn, err := amqp.Dial("amqp://test:test@localhost:5672/")
 	failOnError(err, "Failed to connect to RabbitMQ")
 	defer conn.Close()
