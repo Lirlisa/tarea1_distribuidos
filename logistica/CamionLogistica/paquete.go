@@ -30,13 +30,9 @@ func (c *ServerCamion) PedirPaquete(ctx context.Context, in *Tipo) (*Paquete, er
 			*elem = Estructuras.ColaRetail[0]
 			Estructuras.ColaRetail = Estructuras.ColaRetail[1:]
 			Estructuras.Paquetes[elem.IDPaquete].Estado = 1
-		} else if len(Estructuras.ColaPrioridad) > 0 {
-			*elem = Estructuras.ColaPrioridad[0]
-			Estructuras.ColaPrioridad = Estructuras.ColaPrioridad[1:]
-			Estructuras.Paquetes[elem.IDPaquete].Estado = 1
 		}
 		candado.Unlock()
-	} else {
+	} else if x==2 {
 		candado.Lock()
 		if len(Estructuras.ColaPrioridad) > 0 {
 			*elem = Estructuras.ColaPrioridad[0]
@@ -45,6 +41,19 @@ func (c *ServerCamion) PedirPaquete(ctx context.Context, in *Tipo) (*Paquete, er
 		} else if len(Estructuras.ColaNormal) > 0 {
 			*elem = Estructuras.ColaNormal[0]
 			Estructuras.ColaNormal = Estructuras.ColaNormal[1:]
+			Estructuras.Paquetes[elem.IDPaquete].Estado = 1
+		}
+		candado.Unlock()
+	} else {
+		candado.Lock()
+		if len(Estructuras.ColaRetail) > 0 {
+			*elem = Estructuras.ColaRetail[0]
+			Estructuras.ColaRetail = Estructuras.ColaRetail[1:]
+			Estructuras.Paquetes[elem.IDPaquete].Estado = 1
+		}
+		else if len(Estructuras.ColaPrioridad) > 0 {
+			*elem = Estructuras.ColaPrioridad[0]
+			Estructuras.ColaPrioridad = Estructuras.ColaPrioridad[1:]
 			Estructuras.Paquetes[elem.IDPaquete].Estado = 1
 		}
 		candado.Unlock()
