@@ -109,6 +109,7 @@ func paqueteFinal() {
 	paquete := new(Estructuras.Paquete)
 	paquete.Tipo = "gg"
 	candado.Lock()
+	Estructuras.Paquetes[paquete.IDPaquete] = paquete
 	for i := 0; i < 3; i++ {
 		Estructuras.ColaRetail = append(Estructuras.ColaRetail, *paquete)
 		Estructuras.ColaPrioridad = append(Estructuras.ColaPrioridad, *paquete)
