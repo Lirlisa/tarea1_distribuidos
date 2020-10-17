@@ -113,6 +113,7 @@ func main() {
 					fmt.Printf("Ganancias: %d", gananciasGeneral)
 					fmt.Printf("Perdidas: %d", perdidasGeneral)
 					fmt.Printf("Total: %d", totalGeneral)
+					break
 				}
 			}
 
