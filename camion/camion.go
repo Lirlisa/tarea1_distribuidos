@@ -56,6 +56,7 @@ func camion(tipo uint32, conn *grpc.ClientConn, vehiculo int) {
 
 	var ind1 int
 	var ind2 int
+	fin := 0
 
 	c := CamionLogistica.NewInteraccionesClient(conn)
 
@@ -74,6 +75,9 @@ func camion(tipo uint32, conn *grpc.ClientConn, vehiculo int) {
 	}
 
 	for {
+		if fin != 0 {
+			break
+		}
 		var envio1 paquete
 		var envio2 paquete
 		envio1.ID = 0
@@ -109,8 +113,15 @@ func camion(tipo uint32, conn *grpc.ClientConn, vehiculo int) {
 					registro[ind1] = envio1
 					break
 				}
+				if response.Tipo == "gg" {
+					fin = 1
+					break
+				}
 				time.Sleep(time.Second * 5)
 			}
+		}
+		if fin != 0 {
+			break
 		}
 		time.Sleep(time.Second * time.Duration(tiempo))
 		response, err := c.PedirPaquete(context.Background(), &CamionLogistica.Tipo{Clase: tipo})
@@ -129,6 +140,9 @@ func camion(tipo uint32, conn *grpc.ClientConn, vehiculo int) {
 			envio2.seguimiento = response.Seguimiento
 			ind2 = ind1 + 1
 			registro[ind2] = envio2
+		}
+		if response.Tipo == "gg" {
+			fin = 1
 		}
 
 		if tipo == 2 { ////camion normal aniliza los casos
@@ -206,6 +220,7 @@ func camion(tipo uint32, conn *grpc.ClientConn, vehiculo int) {
 		}
 
 	}
+	wait.Done()
 }
 
 func reparto(envio1 paquete, envio2 paquete) (paquete, paquete) { /////simulación del camion en la calle
