@@ -66,9 +66,3 @@ func escucharCamion(listener net.Listener) {
 		log.Fatalf("failed to serve: %s", err)
 	}
 }
-
-func failOnError(err error, msg string) {
-	if err != nil {
-		log.Fatalf("%s: %s", msg, err)
-	}
-}

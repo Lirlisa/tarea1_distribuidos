@@ -10,7 +10,13 @@ import (
 	"golang.org/x/net/context"
 )
 
-func conectarFinanzas(terminado int32, estado uint32, ganancia uint32, tipo string, id uint32) {
+func failOnError(err error, msg string) {
+	if err != nil {
+		log.Fatalf("%s: %s", msg, err)
+	}
+}
+
+func conectarFinanzas(terminado int32, estado uint32, intentos uint32, ganancia uint32, tipo string, id uint32) {
 	conn, err := amqp.Dial("amqp://admin:password@dist46:5672/")
 	failOnError(err, "Failed to connect to RabbitMQ")
 	defer conn.Close()
@@ -28,16 +34,9 @@ func conectarFinanzas(terminado int32, estado uint32, ganancia uint32, tipo stri
 		nil,     // arguments
 	)
 	failOnError(err, "Failed to declare a queue")
+	var body string
+	body = `{terminado: "` + strconv.FormatUint(uint64(terminado), 10) + `", estado: "` + strconv.FormatUint(uint64(estado), 10) + `", intentos: "` + strconv.FormatUint(uint64(intentos), 10) + `", ganancia: "` + strconv.FormatUint(uint64(ganancia), 10) + `, tipo: "` + tipo + `", id: "` + strconv.FormatUint(uint64(id), 10) + `"}"`
 
-	body := "
-	{
-		terminado: '"+strconv.Itoa(terminado)"',
-		estado: '"+strconv.Itoa(estado)+"',
-		intentos: '"+strconv.Itoa(intentos)+"',
-		ganancia: '"+strconv.Itoa(ganancia)+"',
-		tipo: '"+tipo+"',
-		id: '"+strconv.Itoa(id)+"'
-	}"
 	err = ch.Publish(
 		"",     // exchange
 		q.Name, // routing key
@@ -129,6 +128,6 @@ func (c *ServerCamion) PedirPaquete(ctx context.Context, in *Tipo) (*Paquete, er
 func (c *ServerCamion) DevolverPaquete(ctx context.Context, in *Paquete) (*Paquete, error) {
 	Estructuras.Paquetes[in.IDPaquete].Intentos = in.GetIntentos()
 	Estructuras.Paquetes[in.IDPaquete].Estado = in.GetEstado()
-	go conectarFinanzas(0, in.GetEstado(), in.GetValor(), in.GetTipo, in.GetIDPaquete())
+	go conectarFinanzas(0, in.GetEstado(), in.GetIntentos(), in.GetValor(), in.GetTipo(), in.GetIDPaquete())
 	return in, nil
 }
