@@ -11,6 +11,7 @@ import (
 
 	"./CamionLogistica"
 	"./ClienteLogistica"
+	"./Estructuras"
 	"google.golang.org/grpc"
 )
 
@@ -49,20 +50,20 @@ func main() {
 
 func escucharCliente(listener net.Listener) {
 	servidorCliente := ClienteLogistica.ServerCliente{}
-	grpcServer := grpc.NewServer()
-	ClienteLogistica.RegisterInteraccionesServer(grpcServer, &servidorCliente)
+	Estructuras.GrpcServerCliente = grpc.NewServer()
+	ClienteLogistica.RegisterInteraccionesServer(Estructuras.GrpcServerCliente, &servidorCliente)
 
-	if err := grpcServer.Serve(listener); err != nil {
+	if err := Estructuras.GrpcServerCliente.Serve(listener); err != nil {
 		log.Fatalf("failed to serve: %s", err)
 	}
 }
 
 func escucharCamion(listener net.Listener) {
 	servidorCamion := CamionLogistica.ServerCamion{}
-	grpcServer := grpc.NewServer()
-	CamionLogistica.RegisterInteraccionesServer(grpcServer, &servidorCamion)
+	Estructuras.GrpcServerCamion = grpc.NewServer()
+	CamionLogistica.RegisterInteraccionesServer(Estructuras.GrpcServerCamion, &servidorCamion)
 
-	if err := grpcServer.Serve(listener); err != nil {
+	if err := Estructuras.GrpcServerCamion.Serve(listener); err != nil {
 		log.Fatalf("failed to serve: %s", err)
 	}
 }

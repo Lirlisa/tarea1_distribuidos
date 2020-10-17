@@ -1,6 +1,10 @@
 package Estructuras
 
-import "time"
+import (
+	"time"
+
+	"google.golang.org/grpc"
+)
 
 type Paquete struct {
 	IDPaquete   uint32
@@ -29,6 +33,9 @@ var Paquetes map[uint32]*Paquete = make(map[uint32]*Paquete)
 var ColaRetail []Paquete = make([]Paquete, 0, 10)
 var ColaPrioridad []Paquete = make([]Paquete, 0, 10)
 var ColaNormal []Paquete = make([]Paquete, 0, 10)
+
+var GrpcServerCliente *grpc.Server
+var GrpcServerCamion *grpc.Server
 
 func main() {
 	Paquetes[0] = new(Paquete)

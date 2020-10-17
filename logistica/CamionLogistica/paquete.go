@@ -10,6 +10,8 @@ import (
 	"golang.org/x/net/context"
 )
 
+var contador int
+
 func failOnError(err error, msg string) {
 	if err != nil {
 		log.Fatalf("%s: %s", msg, err)
@@ -99,6 +101,23 @@ func (c *ServerCamion) PedirPaquete(ctx context.Context, in *Tipo) (*Paquete, er
 	}
 	candado.Lock()
 	if item, existe := Estructuras.Tabla[elem.IDPaquete]; existe {
+		if elem.Tipo == "gg" {
+			if contador == 2 {
+				Estructuras.GrpcServerCamion.GracefulStop()
+				candado.Unlock()
+				return &Paquete{
+					IDPaquete:   elem.IDPaquete,
+					Seguimiento: elem.Seguimiento,
+					Tipo:        elem.Tipo,
+					Valor:       elem.Valor,
+					Intentos:    elem.Intentos,
+					Estado:      elem.Estado,
+					Origen:      item.Origen,
+					Destino:     item.Destino,
+				}, nil
+			}
+			contador++
+		}
 		log.Printf("Entregado paquete id: %d", elem.IDPaquete)
 		candado.Unlock()
 		return &Paquete{
