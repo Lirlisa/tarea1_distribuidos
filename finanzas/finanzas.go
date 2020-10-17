@@ -2,8 +2,6 @@ package main
 
 import (
 	"log"
-
-	"github.com/streadway/amqp"
 )
 
 func failOnError(err error, msg string) {
@@ -17,10 +15,6 @@ func main() {
 	failOnError(err, "Failed to connect to RabbitMQ")
 	defer conn.Close()
 	log.Printf("conecta3")
-
-}
-
-/*
 	ch, err := conn.Channel()
 	failOnError(err, "Failed to open a channel")
 	defer ch.Close()
@@ -56,4 +50,3 @@ func main() {
 	log.Printf(" [*] Waiting for messages. To exit press CTRL+C")
 	<-forever
 }
-*/
