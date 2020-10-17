@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"../Estructuras"
+	"github.com/streadway/amqp"
 	"golang.org/x/net/context"
 )
 
@@ -21,6 +22,10 @@ type ServerCliente struct {
 
 func (s *ServerCliente) Encargar(ctx context.Context, in *Encargo) (*Producto, error) {
 	log.Printf("Se ha recibido encargo: %s", in.TipoLocal)
+	if in.TipoLocal == "gg" {
+		paqueteFinal()
+		return &Producto{ID: 0}, nil
+	}
 	content := fmt.Sprintf("%s,%s,%d,%s,%s\n", in.GetTipoLocal(), in.GetNombreProducto(), in.GetValor(), in.GetOrigen(), in.GetDestino())
 	var candado sync.Mutex
 	candado.Lock()
@@ -92,4 +97,54 @@ func (s *ServerCliente) EstadoEncargo(ctx context.Context, in *Producto) (*Estat
 		return &Estatus{Valor: int32(valor.Estado)}, nil
 	}
 	return &Estatus{Valor: 4}, nil //el extraño caso en que no exista el paquete
+}
+
+func paqueteFinal() {
+	var candado sync.Mutex
+	paquete := new(Estructuras.Paquete)
+	paquete.Tipo = "gg"
+	candado.Lock()
+	for i := 0; i < 3; i++ {
+		Estructuras.ColaRetail = append(Estructuras.ColaRetail, *paquete)
+		Estructuras.ColaPrioridad = append(Estructuras.ColaPrioridad, *paquete)
+		Estructuras.ColaNormal = append(Estructuras.ColaNormal, *paquete)
+	}
+	candado.Unlock()
+
+	conn, err := amqp.Dial("amqp://admin:password@dist46:5672/")
+	failOnError(err, "Failed to connect to RabbitMQ")
+	defer conn.Close()
+
+	ch, err := conn.Channel()
+	failOnError(err, "Failed to open a channel")
+	defer ch.Close()
+
+	q, err := ch.QueueDeclare(
+		"hello", // name
+		false,   // durable
+		false,   // delete when unused
+		false,   // exclusive
+		false,   // no-wait
+		nil,     // arguments
+	)
+	failOnError(err, "Failed to declare a queue")
+	var body string
+	body = `{terminado: "1", estado: "0", intentos: "0", ganancia: "0", tipo: "0", id: "0"}`
+
+	err = ch.Publish(
+		"",     // exchange
+		q.Name, // routing key
+		false,  // mandatory
+		false,  // immediate
+		amqp.Publishing{
+			ContentType: "text/plain",
+			Body:        []byte(body),
+		})
+	failOnError(err, "Failed to publish a message")
+}
+
+func failOnError(err error, msg string) {
+	if err != nil {
+		log.Fatalf("%s: %s", msg, err)
+	}
 }
