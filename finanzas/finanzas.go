@@ -1,8 +1,18 @@
 package main
 
 import (
+	"encoding/json"
+	"fmt"
 	"log"
+	"os"
+	"strconv"
+
+	"github.com/streadway/amqp"
 )
+
+var gananciasGeneral int
+var perdidasGeneral int
+var totalGeneral int
 
 func failOnError(err error, msg string) {
 	if err != nil {
@@ -41,12 +51,90 @@ func main() {
 
 	forever := make(chan bool)
 
+	file, err := os.Create("resumen.txt")
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	go func() {
+		gananciapedido := 0
+		perdidapedido := 0
+		totalpedido := 0
+		estado := ""
+		textoGanancias := ""
+		textoPerdidas := ""
+		textoTotal := ""
+		intento := ""
+
+		gananciapedido = 0
+		perdidapedido = 0
+		totalpedido = 0
 		for d := range msgs {
-			log.Printf("Received a message: %s", d.Body)
+
+			var info map[string]interface{}
+			json.Unmarshal([]byte(d.Body), &info)
+
+			if f, ok := (info["terminado"]).(string); ok {
+				if f == "0" {
+					if str1, ok := (info["tipo"]).(string); ok {
+						if str2, ok := (info["ganancias"]).(string); ok {
+							if str3, ok := (info["estado"]).(string); ok {
+								gananciapedido = calcularGanancias(str1, str2, str3)
+								textoGanancias = "GANANCIAS: " + strconv.Itoa(gananciapedido)
+							}
+						}
+					}
+					if intentos, ok := (info["intentos"]).(string); ok {
+						intento = "INTENTOS: " + intentos
+						i, _ := strconv.Atoi(intentos)
+						perdidapedido = 10 * (i - 1)
+						textoPerdidas = "PERDIDAS: " + strconv.Itoa(perdidapedido)
+					}
+
+					totalpedido = gananciapedido - perdidapedido
+					textoTotal = "PERDIDAS: " + strconv.Itoa(totalpedido)
+
+					if str, ok := (info["estado"]).(string); ok {
+						if str == "0" {
+							estado = "NO ENTREGADO"
+						} else {
+							estado = "COMPLETADO"
+						}
+					}
+					if str, ok := (info["id"]).(string); ok {
+						file.WriteString(str + " " + estado + " " + intento + " " + textoGanancias + " " + textoPerdidas + " " + textoTotal + "\n")
+					}
+
+					gananciasGeneral = gananciasGeneral + gananciapedido
+					perdidasGeneral = perdidasGeneral + perdidapedido
+					totalGeneral = totalGeneral + totalpedido
+
+				} else {
+					fmt.Printf("Ganancias: %d", gananciasGeneral)
+					fmt.Printf("Perdidas: %d", perdidasGeneral)
+					fmt.Printf("Total: %d", totalGeneral)
+				}
+			}
+
 		}
 	}()
 
 	log.Printf(" [*] Waiting for messages. To exit press CTRL+C")
 	<-forever
+}
+
+func calcularGanancias(tipo string, valor string, estado string) int {
+	g, _ := strconv.Atoi(valor)
+	if estado != "0" {
+		return g
+	}
+	if tipo == "0" {
+		return g
+	}
+	if tipo == "2" {
+		f := float32(g) * 0.3
+		return int(f)
+	}
+	return 0
+
 }
