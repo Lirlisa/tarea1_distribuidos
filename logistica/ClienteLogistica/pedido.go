@@ -1,8 +1,10 @@
 package ClienteLogistica
 
 import (
+	"fmt"
 	"log"
 	"math/rand"
+	"os"
 	"sync"
 	"time"
 
@@ -19,8 +21,19 @@ type ServerCliente struct {
 
 func (s *ServerCliente) Encargar(ctx context.Context, in *Encargo) (*Producto, error) {
 	log.Printf("Se ha recibido encargo: %s", in.TipoLocal)
+	content := fmt.Sprintf("%s,%s,%d,%s,%s\n", in.GetTipoLocal(), in.GetNombreProducto(), in.GetValor(), in.GetOrigen(), in.GetDestino())
 	var candado sync.Mutex
 	candado.Lock()
+	f, err := os.OpenFile("bitacora.csv", os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0600)
+	if err != nil {
+		log.Fatalf("Ha ocurrido un error con el archivo: %s", err)
+	}
+
+	if _, err = f.WriteString(content); err != nil {
+		f.Close()
+		log.Panicf("Error al escribir en archivo: %s", err)
+	}
+	f.Close()
 	id_disponible++
 	idReservada := id_disponible
 
