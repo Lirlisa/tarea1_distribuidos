@@ -57,19 +57,20 @@ func main() {
 	}
 
 	go func() {
-		gananciapedido := 0
-		perdidapedido := 0
-		totalpedido := 0
-		estado := ""
-		textoGanancias := ""
-		textoPerdidas := ""
-		textoTotal := ""
-		intento := ""
 
-		gananciapedido = 0
-		perdidapedido = 0
-		totalpedido = 0
 		for d := range msgs {
+			gananciapedido := 0
+			perdidapedido := 0
+			totalpedido := 0
+			estado := ""
+			textoGanancias := ""
+			textoPerdidas := ""
+			textoTotal := ""
+			intento := ""
+
+			gananciapedido = 0
+			perdidapedido = 0
+			totalpedido = 0
 
 			var info map[string]interface{}
 			json.Unmarshal([]byte(d.Body), &info)
