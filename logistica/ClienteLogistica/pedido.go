@@ -60,8 +60,9 @@ func (s *ServerCliente) Encargar(ctx context.Context, in *Encargo) (*Producto, e
 		in.GetDestino(),
 		int32(test),
 	}
+	candado.Lock()
 	Estructuras.Tabla[idReservada] = nuevoRegistro
-
+	candado.Unlock()
 	pack := Estructuras.Paquete{
 		idReservada,
 		uint32(test),
@@ -70,8 +71,9 @@ func (s *ServerCliente) Encargar(ctx context.Context, in *Encargo) (*Producto, e
 		0,
 		0,
 	}
+	candado.Lock()
 	Estructuras.Paquetes[idReservada] = &pack
-
+	candado.Unlock()
 	switch x := in.GetTipoLocal(); x {
 	case "retail":
 		candado.Lock()
@@ -92,10 +94,13 @@ func (s *ServerCliente) Encargar(ctx context.Context, in *Encargo) (*Producto, e
 }
 func (s *ServerCliente) EstadoEncargo(ctx context.Context, in *Producto) (*Estatus, error) {
 	log.Printf("Solicitado estado de %d", in.ID)
-
+	var candado sync.Mutex
+	candado.Lock()
 	if valor, existencia := Estructuras.Paquetes[Estructuras.SeguimientoAId[in.ID]]; existencia {
+		candado.Unlock()
 		return &Estatus{Valor: int32(valor.Estado)}, nil
 	}
+	candado.Unlock()
 	return &Estatus{Valor: 4}, nil //el extraño caso en que no exista el paquete
 }
 

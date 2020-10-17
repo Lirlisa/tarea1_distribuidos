@@ -97,9 +97,10 @@ func (c *ServerCamion) PedirPaquete(ctx context.Context, in *Tipo) (*Paquete, er
 		}
 		candado.Unlock()
 	}
-
+	candado.Lock()
 	if item, existe := Estructuras.Tabla[elem.IDPaquete]; existe {
 		log.Printf("Entregado paquete id: %d", elem.IDPaquete)
+		candado.Unlock()
 		return &Paquete{
 			IDPaquete:   elem.IDPaquete,
 			Seguimiento: elem.Seguimiento,
@@ -111,6 +112,7 @@ func (c *ServerCamion) PedirPaquete(ctx context.Context, in *Tipo) (*Paquete, er
 			Destino:     item.Destino,
 		}, nil
 	} else {
+		candado.Unlock()
 		return &Paquete{
 			IDPaquete:   0,
 			Seguimiento: 0,
@@ -126,8 +128,11 @@ func (c *ServerCamion) PedirPaquete(ctx context.Context, in *Tipo) (*Paquete, er
 }
 
 func (c *ServerCamion) DevolverPaquete(ctx context.Context, in *Paquete) (*Paquete, error) {
+	var candado sync.Mutex
+	candado.Lock()
 	Estructuras.Paquetes[in.IDPaquete].Intentos = in.GetIntentos()
 	Estructuras.Paquetes[in.IDPaquete].Estado = in.GetEstado()
+	candado.Unlock()
 	go conectarFinanzas(in.GetEstado(), in.GetIntentos(), in.GetValor(), in.GetTipo(), in.GetIDPaquete())
 	return in, nil
 }
