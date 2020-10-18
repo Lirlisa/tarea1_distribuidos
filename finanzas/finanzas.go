@@ -77,6 +77,7 @@ func main() {
 
 			if f, ok := (info["terminado"]).(string); ok {
 				if f == "0" {
+					fmt.Println("termindo=%s; id=%s", (info["terminado"]).(string), (info["id"]).(string))
 					if str1, ok := (info["tipo"]).(string); ok {
 						if str2, ok := (info["ganancias"]).(string); ok {
 							if str3, ok := (info["estado"]).(string); ok {

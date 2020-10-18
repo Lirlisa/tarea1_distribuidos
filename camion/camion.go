@@ -114,8 +114,7 @@ func camion(tipo uint32, conn *grpc.ClientConn, vehiculo int) {
 					break
 				}
 				if response.Tipo == "gg" {
-					fin = 1
-					break
+					return
 				}
 				time.Sleep(time.Second * 5)
 			}
@@ -143,6 +142,7 @@ func camion(tipo uint32, conn *grpc.ClientConn, vehiculo int) {
 		}
 		if response.Tipo == "gg" {
 			fin = 1
+			return
 		}
 
 		if tipo == 2 { ////camion normal aniliza los casos
