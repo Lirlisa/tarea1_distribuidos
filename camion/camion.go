@@ -42,9 +42,11 @@ func main() {
 	}
 	defer conn.Close()
 
-	wait.Add(3)
+	wait.Add(1)
 	go camion(1, conn, 1)
+	wait.Add(1)
 	go camion(1, conn, 2)
+	wait.Add(1)
 	go camion(2, conn, 3)
 	wait.Wait()
 
@@ -232,7 +234,7 @@ func camion(tipo uint32, conn *grpc.ClientConn, vehiculo int) {
 	if err != nil {
 		log.Fatalf("Error al termiar: %s", err)
 	}
-	fmt.Printf("Entregada información termino: %d\n", response.IDPaquete)
+	fmt.Printf("Entregada información término: %d camión %d\n", response.IDPaquete, vehiculo)
 	wait.Done()
 }
 

@@ -140,7 +140,7 @@ func cliente(seguimiento uint32, conn *grpc.ClientConn) {
 			break
 		}
 		//Se realiza consulta
-		time.Sleep(time.Second * 5) /////////////////////////////VALOR MODIFICABLE
+		time.Sleep(time.Second * 10) /////////////////////////////VALOR MODIFICABLE
 		fmt.Printf("QUIERO CONSULTAR POR MI PEDIDO: %d\n", seguimiento)
 
 		cliente := pedido.NewInteraccionesClient(conn)
