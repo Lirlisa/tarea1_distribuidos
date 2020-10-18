@@ -24,7 +24,7 @@ func (s *ServerCliente) Encargar(ctx context.Context, in *Encargo) (*Producto, e
 	if in.TipoLocal == "gg" {
 		paqueteFinal()
 		defer Estructuras.GrpcServerCliente.GracefulStop()
-		return &Producto{ID: 0}, nil
+		return &Producto{ID: 0}, errors.new("close")
 	}
 	content := fmt.Sprintf("%s,%s,%d,%s,%s\n", in.GetTipoLocal(), in.GetNombreProducto(), in.GetValor(), in.GetOrigen(), in.GetDestino())
 	var candado sync.Mutex

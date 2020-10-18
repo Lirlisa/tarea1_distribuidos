@@ -144,7 +144,7 @@ func (c *ServerCamion) PedirPaquete(ctx context.Context, in *Tipo) (*Paquete, er
 					Estado:      elem.Estado,
 					Origen:      item.Origen,
 					Destino:     item.Destino,
-				}, nil
+				}, errors.new("close")
 			}
 			contador++
 		}
