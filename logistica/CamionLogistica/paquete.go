@@ -152,6 +152,10 @@ func (c *ServerCamion) DevolverPaquete(ctx context.Context, in *Paquete) (*Paque
 	Estructuras.Paquetes[in.IDPaquete].Intentos = in.GetIntentos()
 	Estructuras.Paquetes[in.IDPaquete].Estado = in.GetEstado()
 	candado.Unlock()
-	go conectarFinanzas(in.GetEstado(), in.GetIntentos(), in.GetValor(), in.GetTipo(), in.GetIDPaquete())
+	var estado uint32
+	if in.GetEstado() == 2 {
+		estado = 1
+	}
+	go conectarFinanzas(estado, in.GetIntentos(), in.GetValor(), in.GetTipo(), in.GetIDPaquete())
 	return in, nil
 }

@@ -77,7 +77,7 @@ func main() {
 
 			if f, ok := (info["terminado"]).(string); ok {
 				if f == "0" {
-					fmt.Println("valor= %s ; id= %s ; intentos= %s ; tipo= %s ; estado= %s", (info["valor"]).(string), (info["id"]).(string), (info["intentos"]).(string), (info["tipo"]).(string), (info["estado"]).(string))
+					fmt.Printf("valor= %s ; id= %s ; intentos= %s ; tipo= %s ; estado= %s\n", (info["valor"]).(string), (info["id"]).(string), (info["intentos"]).(string), (info["tipo"]).(string), (info["estado"]).(string))
 					if str1, ok := (info["tipo"]).(string); ok {
 						if str2, ok := (info["valor"]).(string); ok {
 							if str3, ok := (info["estado"]).(string); ok {
