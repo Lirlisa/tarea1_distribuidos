@@ -29,7 +29,7 @@ func main() {
 		log.Fatalf("Se ha producido un error: %s", err2)
 	}
 
-	fmt.Println("Iniciado servidor en escucha en puerto 9000")
+	fmt.Println("Iniciado servidor en escucha en puerto 9000 y 9001")
 
 	wait.Add(2)
 	go func() {

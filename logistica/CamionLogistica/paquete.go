@@ -1,10 +1,11 @@
 package CamionLogistica
 
 import (
+	"fmt"
 	"log"
 	"strconv"
 	"sync"
-	"errors"
+
 	"../Estructuras"
 	"github.com/streadway/amqp"
 	"golang.org/x/net/context"
@@ -144,7 +145,7 @@ func (c *ServerCamion) PedirPaquete(ctx context.Context, in *Tipo) (*Paquete, er
 					Estado:      elem.Estado,
 					Origen:      item.Origen,
 					Destino:     item.Destino,
-				}, errors.new("close")
+				}, fmt.Errorf("cerrar")
 			}
 			contador++
 		}
