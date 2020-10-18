@@ -103,7 +103,7 @@ func (c *ServerCamion) PedirPaquete(ctx context.Context, in *Tipo) (*Paquete, er
 	if item, existe := Estructuras.Tabla[elem.IDPaquete]; existe {
 		if elem.Tipo == "gg" {
 			if contador == 2 {
-				Estructuras.GrpcServerCamion.GracefulStop()
+				defer Estructuras.GrpcServerCamion.GracefulStop()
 				candado.Unlock()
 				return &Paquete{
 					IDPaquete:   elem.IDPaquete,
