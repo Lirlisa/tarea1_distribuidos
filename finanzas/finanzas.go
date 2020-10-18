@@ -131,10 +131,10 @@ func calcularGanancias(tipo string, valor string, estado string) int {
 	if estado != "0" {
 		return g
 	}
-	if tipo == "0" {
+	if tipo == "retail" {
 		return g
 	}
-	if tipo == "2" {
+	if tipo == "prioritario" {
 		f := float32(g) * 0.3
 		return int(f)
 	}
