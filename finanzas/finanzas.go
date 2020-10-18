@@ -88,48 +88,38 @@ func main() {
 			info := make(map[string]interface{})
 			json.Unmarshal([]byte(d.Body), &info)
 
-			if f, ok := (info["terminado"]).(string); ok {
-				if f == "0" {
-					fmt.Printf("valor= %s ; id= %s ; intentos= %s ; tipo= %s ; estado= %s\n", (info["valor"]).(string), (info["id"]).(string), (info["intentos"]).(string), (info["tipo"]).(string), (info["estado"]).(string))
-					if str1, ok := (info["tipo"]).(string); ok {
-						if str2, ok := (info["valor"]).(string); ok {
-							if str3, ok := (info["estado"]).(string); ok {
-								gananciapedido = calcularGanancias(str1, str2, str3)
-								textoGanancias = "GANANCIAS: " + strconv.Itoa(gananciapedido)
-							}
-						}
+			if str1, ok := (info["tipo"]).(string); ok {
+				if str2, ok := (info["valor"]).(string); ok {
+					if str3, ok := (info["estado"]).(string); ok {
+						gananciapedido = calcularGanancias(str1, str2, str3)
+						textoGanancias = "GANANCIAS: " + strconv.Itoa(gananciapedido)
 					}
-					if intentos, ok := (info["intentos"]).(string); ok {
-						intento = "INTENTOS: " + intentos
-						i, _ := strconv.Atoi(intentos)
-						perdidapedido = 10 * (i - 1)
-						textoPerdidas = "PERDIDAS: " + strconv.Itoa(perdidapedido)
-					}
-
-					totalpedido = gananciapedido - perdidapedido
-					textoTotal = "TOTAL: " + strconv.Itoa(totalpedido)
-
-					if str, ok := (info["estado"]).(string); ok {
-						if str == "0" {
-							estado = "NO ENTREGADO"
-						} else {
-							estado = "COMPLETADO"
-						}
-					}
-					if str, ok := (info["id"]).(string); ok {
-						file.WriteString(str + " " + estado + " " + intento + " " + textoGanancias + " " + textoPerdidas + " " + textoTotal + "\n")
-					}
-
-					gananciasGeneral = gananciasGeneral + gananciapedido
-					perdidasGeneral = perdidasGeneral + perdidapedido
-					totalGeneral = totalGeneral + totalpedido
-
-				} else {
-					fmt.Printf("Ganancias: %d \n", gananciasGeneral)
-					fmt.Printf("Perdidas: %d \n", perdidasGeneral)
-					fmt.Printf("Total: %d \n", totalGeneral)
 				}
 			}
+			if intentos, ok := (info["intentos"]).(string); ok {
+				intento = "INTENTOS: " + intentos
+				i, _ := strconv.Atoi(intentos)
+				perdidapedido = 10 * (i - 1)
+				textoPerdidas = "PERDIDAS: " + strconv.Itoa(perdidapedido)
+			}
+
+			totalpedido = gananciapedido - perdidapedido
+			textoTotal = "TOTAL: " + strconv.Itoa(totalpedido)
+
+			if str, ok := (info["estado"]).(string); ok {
+				if str == "0" {
+					estado = "NO ENTREGADO"
+				} else {
+					estado = "COMPLETADO"
+				}
+			}
+			if str, ok := (info["id"]).(string); ok {
+				file.WriteString(str + " " + estado + " " + intento + " " + textoGanancias + " " + textoPerdidas + " " + textoTotal + "\n")
+			}
+
+			gananciasGeneral = gananciasGeneral + gananciapedido
+			perdidasGeneral = perdidasGeneral + perdidapedido
+			totalGeneral = totalGeneral + totalpedido
 
 		}
 	}()
