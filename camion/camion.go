@@ -182,7 +182,7 @@ func camion(tipo uint32, conn *grpc.ClientConn, vehiculo int) {
 				Origen:      envio1.origen,
 				Destino:     envio1.destino})
 			if err != nil {
-				log.Fatalf("Error al pedir paquete: %s", err)
+				log.Fatalf("Error al devolver paquete: %s", err)
 			}
 			fmt.Printf("Entregada información pedido: %d\n", response.IDPaquete)
 
@@ -206,7 +206,7 @@ func camion(tipo uint32, conn *grpc.ClientConn, vehiculo int) {
 				Origen:      envio2.origen,
 				Destino:     envio2.destino})
 			if err != nil {
-				log.Fatalf("Error al pedir paquete: %s", err)
+				log.Fatalf("Error al devolver paquete: %s", err)
 			}
 			fmt.Printf("Entregada información pedido: %d\n", response.IDPaquete)
 
@@ -220,6 +220,19 @@ func camion(tipo uint32, conn *grpc.ClientConn, vehiculo int) {
 		}
 
 	}
+	response, err := c.DevolverPaquete(context.Background(), &CamionLogistica.Paquete{
+		IDPaquete:   0,
+		Seguimiento: 0,
+		Tipo:        "gg",
+		Valor:       0,
+		Intentos:    0,
+		Estado:      0,
+		Origen:      "",
+		Destino:     ""})
+	if err != nil {
+		log.Fatalf("Error al termiar: %s", err)
+	}
+	fmt.Printf("Entregada información termino: %d\n", response.IDPaquete)
 	wait.Done()
 }
 
