@@ -5,7 +5,9 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"os/signal"
 	"strconv"
+	"syscall"
 
 	"github.com/streadway/amqp"
 )
@@ -21,6 +23,17 @@ func failOnError(err error, msg string) {
 }
 
 func main() {
+
+	c := make(chan os.Signal)
+	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
+	go func() {
+		<-c
+		fmt.Printf("Ganancias: %d \n", gananciasGeneral)
+		fmt.Printf("Perdidas: %d \n", perdidasGeneral)
+		fmt.Printf("Total: %d \n", totalGeneral)
+		os.Exit(0)
+	}()
+
 	conn, err := amqp.Dial("amqp://admin:password@localhost:5672/")
 	failOnError(err, "Failed to connect to RabbitMQ")
 	defer conn.Close()
