@@ -113,18 +113,6 @@ func recibir(archivo string, tienda int, conn *grpc.ClientConn) {
 		}
 	}
 	wait.Wait()
-	cliente1 := pedido.NewInteraccionesClient(conn)
-	response, err := cliente1.Encargar(context.Background(), &pedido.Encargo{
-		TipoLocal:      "gg",
-		NombreProducto: "",
-		Valor:          0,
-		Origen:         "",
-		Destino:        "",
-	})
-	if err != nil {
-		log.Fatalf("Error al Encargar: %s", err)
-	}
-	fmt.Printf("Terminado %d", response.ID)
 
 }
 
