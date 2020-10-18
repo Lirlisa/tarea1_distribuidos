@@ -130,7 +130,7 @@ func calcularGanancias(tipo string, valor string, estado string) int {
 	g, _ := strconv.Atoi(valor)
 	if estado != "0" {
 		if tipo == "prioritario" {
-			return float32(g) * 1.3
+			return int(float32(g) * 1.3)
 		}
 		return g
 	}
