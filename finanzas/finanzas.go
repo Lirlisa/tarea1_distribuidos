@@ -72,7 +72,7 @@ func main() {
 			perdidapedido = 0
 			totalpedido = 0
 
-			var info map[string]interface{}
+			info := make(map[string]interface{})
 			json.Unmarshal([]byte(d.Body), &info)
 
 			if f, ok := (info["terminado"]).(string); ok {

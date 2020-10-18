@@ -136,7 +136,7 @@ func paqueteFinal() {
 	)
 	failOnError(err, "Failed to declare a queue")
 	var body string
-	body = `{terminado: "1", estado: "0", intentos: "0", ganancia: "0", tipo: "0", id: "0"}`
+	body = `{"terminado": "1", "estado": "0", "intentos": "0", "ganancia": "0", "tipo": "0", "id": "0"}`
 
 	err = ch.Publish(
 		"",     // exchange
