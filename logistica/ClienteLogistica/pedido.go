@@ -7,7 +7,7 @@ import (
 	"os"
 	"sync"
 	"time"
-
+	"errors"
 	"../Estructuras"
 	"golang.org/x/net/context"
 )
@@ -113,11 +113,10 @@ func paqueteFinal() {
 	candado.Lock()
 	Estructuras.Paquetes[paquete.IDPaquete] = paquete
 	Estructuras.Tabla[registro.Id] = registro
-	for i := 0; i < 3; i++ {
-		Estructuras.ColaRetail = append(Estructuras.ColaRetail, *paquete)
-		Estructuras.ColaPrioridad = append(Estructuras.ColaPrioridad, *paquete)
-		Estructuras.ColaNormal = append(Estructuras.ColaNormal, *paquete)
-	}
+
+	Estructuras.ColaRetail = append(Estructuras.ColaRetail, *paquete)
+	Estructuras.ColaPrioridad = append(Estructuras.ColaPrioridad, *paquete)
+	Estructuras.ColaNormal = append(Estructuras.ColaNormal, *paquete)
 	candado.Unlock()
 
 }

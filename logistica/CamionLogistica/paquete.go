@@ -4,7 +4,7 @@ import (
 	"log"
 	"strconv"
 	"sync"
-
+	"errors"
 	"../Estructuras"
 	"github.com/streadway/amqp"
 	"golang.org/x/net/context"
