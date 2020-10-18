@@ -1,7 +1,6 @@
 package CamionLogistica
 
 import (
-	"fmt"
 	"log"
 	"strconv"
 	"sync"
@@ -145,7 +144,7 @@ func (c *ServerCamion) PedirPaquete(ctx context.Context, in *Tipo) (*Paquete, er
 					Estado:      elem.Estado,
 					Origen:      item.Origen,
 					Destino:     item.Destino,
-				}, fmt.Errorf("cerrar")
+				}, nil
 			}
 			contador++
 		}
