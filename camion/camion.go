@@ -36,7 +36,7 @@ func main() {
 	fmt.Scanln(&tiempoEntrega)
 
 	var conn *grpc.ClientConn
-	conn, err := grpc.Dial(":9001", grpc.WithInsecure())
+	conn, err := grpc.Dial("dist47:9001", grpc.WithInsecure())
 	if err != nil {
 		log.Fatalf("did not connect: %s", err)
 	}
