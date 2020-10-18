@@ -108,8 +108,11 @@ func paqueteFinal() {
 	var candado sync.Mutex
 	paquete := new(Estructuras.Paquete)
 	paquete.Tipo = "gg"
+	registro := new(Estructuras.Registro)
+	registro.Tipo = "gg"
 	candado.Lock()
 	Estructuras.Paquetes[paquete.IDPaquete] = paquete
+	Estructuras.Tabla[registro.Id] = registro
 	for i := 0; i < 3; i++ {
 		Estructuras.ColaRetail = append(Estructuras.ColaRetail, *paquete)
 		Estructuras.ColaPrioridad = append(Estructuras.ColaPrioridad, *paquete)
