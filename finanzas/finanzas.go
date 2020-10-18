@@ -79,7 +79,7 @@ func main() {
 				if f == "0" {
 					fmt.Println("valor= %s ; id= %s ; intentos= %s ; tipo= %s ; estado= %s", (info["ganancia"]).(string), (info["id"]).(string), (info["intentos"]).(string), info["tipo"]).(string),  info["estado"]).(string))
 					if str1, ok := (info["tipo"]).(string); ok {
-						if str2, ok := (info["ganancias"]).(string); ok {
+						if str2, ok := (info["valor"]).(string); ok {
 							if str3, ok := (info["estado"]).(string); ok {
 								gananciapedido = calcularGanancias(str1, str2, str3)
 								textoGanancias = "GANANCIAS: " + strconv.Itoa(gananciapedido)
@@ -94,7 +94,7 @@ func main() {
 					}
 
 					totalpedido = gananciapedido - perdidapedido
-					textoTotal = "PERDIDAS: " + strconv.Itoa(totalpedido)
+					textoTotal = "TOTAL: " + strconv.Itoa(totalpedido)
 
 					if str, ok := (info["estado"]).(string); ok {
 						if str == "0" {
@@ -112,9 +112,9 @@ func main() {
 					totalGeneral = totalGeneral + totalpedido
 
 				} else {
-					fmt.Printf("Ganancias: %d", gananciasGeneral)
-					fmt.Printf("Perdidas: %d", perdidasGeneral)
-					fmt.Printf("Total: %d", totalGeneral)
+					fmt.Printf("Ganancias: %d \n", gananciasGeneral)
+					fmt.Printf("Perdidas: %d \n", perdidasGeneral)
+					fmt.Printf("Total: %d \n", totalGeneral)
 					break
 				}
 			}

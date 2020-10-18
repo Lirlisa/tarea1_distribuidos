@@ -37,7 +37,7 @@ func conectarFinanzas(estado uint32, intentos uint32, ganancia uint32, tipo stri
 	)
 	failOnError(err, "Failed to declare a queue")
 	var body string
-	body = `{"terminado": "0", "estado": "` + strconv.FormatUint(uint64(estado), 10) + `", "intentos": "` + strconv.FormatUint(uint64(intentos), 10) + `", "ganancia": "` + strconv.FormatUint(uint64(ganancia), 10) + `", "tipo": "` + tipo + `", "id": "` + strconv.FormatUint(uint64(id), 10) + `"}`
+	body = `{"terminado": "0", "estado": "` + strconv.FormatUint(uint64(estado), 10) + `", "intentos": "` + strconv.FormatUint(uint64(intentos), 10) + `", "valor": "` + strconv.FormatUint(uint64(ganancia), 10) + `", "tipo": "` + tipo + `", "id": "` + strconv.FormatUint(uint64(id), 10) + `"}`
 
 	err = ch.Publish(
 		"",     // exchange
