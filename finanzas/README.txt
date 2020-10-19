@@ -21,3 +21,6 @@ El registro de finanzas es el archivo "resumen.txt"
 
 Los registros de logistica se almacenan en el archivo 'bitacora.csv' que está en el directorio de logistica,
 almacenana registro entre ejecuciones.
+
+logistica, finanzas y camion se quedan en escucha constantemente, en caso de que se quiera ejecutar clientes
+e otro modo o con otros datos. 
