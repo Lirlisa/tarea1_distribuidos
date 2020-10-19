@@ -13,6 +13,7 @@ import (
 	"google.golang.org/grpc"
 )
 
+//estructura utilizada por camión
 type paquete struct {
 	ID          uint32
 	tipo        string
@@ -29,12 +30,16 @@ var tiempoEntrega int
 var wait sync.WaitGroup
 
 func main() {
+	//Semilla para aleatoriedad
 	rand.Seed(time.Now().UnixNano())
+
+	//Solicitud tiempos
 	fmt.Println("Tiempo de espera de los camiones (En segundos):")
 	fmt.Scanln(&tiempo)
 	fmt.Println("Tiempo que tardan en entregar los camiones (En segundos):")
 	fmt.Scanln(&tiempoEntrega)
 
+	//Se establece comunicación
 	var conn *grpc.ClientConn
 	conn, err := grpc.Dial("dist47:9001", grpc.WithInsecure())
 	if err != nil {
@@ -42,6 +47,7 @@ func main() {
 	}
 	defer conn.Close()
 
+	//Se generan los 3 camiones
 	wait.Add(1)
 	go camion(1, conn, 1)
 	wait.Add(1)
@@ -52,8 +58,10 @@ func main() {
 
 }
 
+//Realiza las solicitudes de los paquetes, analiza los casos de reparto y envía la información de los paquetes al completar las entregas
 func camion(tipo uint32, conn *grpc.ClientConn, vehiculo int) {
 
+	//registro interno para cada camion
 	registro := make(map[int]paquete)
 
 	var ind1 int
@@ -63,6 +71,7 @@ func camion(tipo uint32, conn *grpc.ClientConn, vehiculo int) {
 
 	var archivo string
 
+	//se crea el archivo de registro correspondiente a cada camion
 	archivo = "camion1.txt"
 	if vehiculo == 2 {
 		archivo = "camion2.txt"
@@ -75,9 +84,11 @@ func camion(tipo uint32, conn *grpc.ClientConn, vehiculo int) {
 		log.Fatal(err)
 	}
 
+	//Simulación camión
 	for {
 		var envio1 paquete
 		var envio2 paquete
+		//valores para que en caso de que no reciba nada, algunas funiones no mueran
 		envio1.ID = 0
 		envio1.tipo = ""
 		envio1.valor = 0
@@ -87,6 +98,7 @@ func camion(tipo uint32, conn *grpc.ClientConn, vehiculo int) {
 		ind1 = 0
 		ind2 = 0
 
+		//Solicitud primer paquete hasta que reciba uno
 		for {
 			if envio1.ID == 0 {
 				response, err := c.PedirPaquete(context.Background(), &CamionLogistica.Tipo{Clase: tipo})
@@ -114,6 +126,7 @@ func camion(tipo uint32, conn *grpc.ClientConn, vehiculo int) {
 				time.Sleep(time.Second * 5)
 			}
 		}
+		//Espera el tiempo especificado para solicitar otro paquete, si no recibe nada se va a reparto
 		time.Sleep(time.Second * time.Duration(tiempo))
 		response, err := c.PedirPaquete(context.Background(), &CamionLogistica.Tipo{Clase: tipo})
 		if err != nil {
@@ -132,7 +145,7 @@ func camion(tipo uint32, conn *grpc.ClientConn, vehiculo int) {
 			ind2 = ind1 + 1
 			registro[ind2] = envio2
 		}
-
+		//Se analiza cual paquete debería ser el primero en intentar entrega y se va a reparto
 		if tipo == 2 { ////camion normal aniliza los casos
 			if envio1.tipo == "prioritario" {
 				envio1, envio2 = reparto(envio1, envio2)
@@ -151,6 +164,7 @@ func camion(tipo uint32, conn *grpc.ClientConn, vehiculo int) {
 			}
 		}
 
+		//A partir de la respuesta de reparto se escribe en los archivos y se entrega información a logistica
 		if envio1.ID != 0 {
 			registro[ind1] = envio1
 			file.WriteString(fmt.Sprint(envio1.ID) + " " + envio1.tipo + " " + fmt.Sprint(envio1.valor) + " " + envio1.origen + " " + envio1.destino + " " + fmt.Sprint(envio1.intentos) + " " + envio1.fentrega + "\n")
@@ -160,6 +174,7 @@ func camion(tipo uint32, conn *grpc.ClientConn, vehiculo int) {
 			} else {
 				entrega = 2
 			}
+			//Se envía información
 			response, err := c.DevolverPaquete(context.Background(), &CamionLogistica.Paquete{
 				IDPaquete:   envio1.ID,
 				Seguimiento: envio1.seguimiento,
@@ -184,6 +199,7 @@ func camion(tipo uint32, conn *grpc.ClientConn, vehiculo int) {
 			} else {
 				entrega = 2
 			}
+			//Se envía información
 			response, err := c.DevolverPaquete(context.Background(), &CamionLogistica.Paquete{
 				IDPaquete:   envio2.ID,
 				Seguimiento: envio2.seguimiento,
@@ -199,6 +215,7 @@ func camion(tipo uint32, conn *grpc.ClientConn, vehiculo int) {
 			fmt.Printf("Entregada información pedido: %d\n", response.IDPaquete)
 
 		}
+		//se analiza el caso en que un camion tipo retail puede recibir paquetes prioritarios
 		if tipo == 1 || tipo == 3 {
 			if envio1.tipo == "retail" || envio2.tipo == "retail" {
 				tipo = 3
@@ -211,7 +228,7 @@ func camion(tipo uint32, conn *grpc.ClientConn, vehiculo int) {
 
 }
 
-func reparto(envio1 paquete, envio2 paquete) (paquete, paquete) { /////simulación del camion en la calle
+func reparto(envio1 paquete, envio2 paquete) (paquete, paquete) { /////simulación del camion en la calle, el orden en el que llegan los paquetes es en el que se intentan entregar
 	var intento1 uint32
 	var intento2 uint32
 	var break1 int
@@ -225,28 +242,28 @@ func reparto(envio1 paquete, envio2 paquete) (paquete, paquete) { /////simulaci�
 		} else {
 			envio1, break1 = entrega(envio1, intento1)
 		}
-		time.Sleep(time.Second * time.Duration(tiempoEntrega))
+		time.Sleep(time.Second * time.Duration(tiempoEntrega))          //se espera el tiempo especificado entre entregas
 		if envio2.valor == 0 || envio2.fentrega != "0" || break2 == 1 { /////intenta entregar segundo pedido
 			break2 = 1
 		} else {
 			envio2, break2 = entrega(envio2, intento2)
 		}
-		if break1 == 1 && break2 == 1 { ////si se entregan ambos o rompe condiciones vuelve
+		if break1 == 1 && break2 == 1 { ////si se entregan ambos o rompe condiciones vuelve a la central
 			break
 		}
-		time.Sleep(time.Second * time.Duration(tiempoEntrega))
+		time.Sleep(time.Second * time.Duration(tiempoEntrega)) //se espera el tiempo especificado entre entregas
 	}
 	return envio1, envio2
 }
 
-func entrega(envio paquete, intentos uint32) (paquete, int) { /// revisar condiciones para realizar entrega, retorna 1 si no se puede entregar
+func entrega(envio paquete, intentos uint32) (paquete, int) { /// revisar condiciones para realizar entrega,además del paquete retorna 1 si no se puede entregar
 	if envio.tipo == "retail" {
-		if envio.intentos < intentos && envio.fentrega == "0" {
+		if envio.intentos < intentos && envio.fentrega == "0" { //condiciones retail
 			return probentregar(envio), 0
 		}
 		return envio, 1
 	}
-	if envio.valor > 10*envio.intentos && envio.intentos < intentos && envio.fentrega == "0" {
+	if envio.valor > 10*envio.intentos && envio.intentos < intentos && envio.fentrega == "0" { //condiciones pyme
 		return probentregar(envio), 0
 	}
 	return envio, 1
@@ -258,16 +275,16 @@ func cantintentos(envio paquete) (uint32, int) { /// entrega la cantidad de inte
 	} else if envio.tipo == "" {
 		return 0, 1
 	}
-	return 2, 0
+	return 3, 0
 }
 
 func probentregar(envio paquete) paquete { ///realiza la simulación de entregar en domicilio modifica la fecha si es que entrega
 	var prob int
 	envio.intentos = envio.intentos + 1
 	prob = rand.Intn(100)
-	if prob >= 80 {
+	if prob >= 80 { //20% de fallar
 		envio.fentrega = "0"
-	} else {
+	} else { //si entrega ingresa la fecha actual
 		present := time.Now()
 		envio.fentrega = present.Format("01-02-2006 15:04:05")
 	}
