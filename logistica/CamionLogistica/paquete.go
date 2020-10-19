@@ -66,9 +66,12 @@ func (c *ServerCamion) PedirPaquete(ctx context.Context, in *Tipo) (*Paquete, er
 	var a string
 	if in.GetClase() == 1 {
 		a = "Retail"
-	} else {
+	} else if in.GetClase() == 2 {
 		a = "Normal"
+	} else {
+		a = "Prioritario"
 	}
+
 	log.Printf("Pedido de paquete de tipo %s", a)
 	elem := new(Estructuras.Paquete)
 

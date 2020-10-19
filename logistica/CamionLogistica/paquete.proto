@@ -20,7 +20,7 @@ message Paquete {
 }
 
 message Tipo {
-    uint32 clase = 1;//1: retail, 2: normal
+    uint32 clase = 1;//1: retail, 2: normal, 3: prioritario
 }
 
 service Interacciones {
