@@ -13,12 +13,15 @@ import (
 var contador int
 
 func failOnError(err error, msg string) {
+	//función que permite ahorrar unas lineas para manejar errores
 	if err != nil {
 		log.Fatalf("%s: %s", msg, err)
 	}
 }
 
 func conectarFinanzas(estado uint32, intentos uint32, ganancia uint32, tipo string, id uint32) {
+	//recibe los datos de paquetes ya entregados a finanas para qeu lleve las cuentas
+
 	conn, err := amqp.Dial("amqp://admin:password@dist46:5672/")
 	failOnError(err, "Failed to connect to RabbitMQ")
 	defer conn.Close()
@@ -56,6 +59,9 @@ type ServerCamion struct {
 }
 
 func (c *ServerCamion) PedirPaquete(ctx context.Context, in *Tipo) (*Paquete, error) {
+	//Maneja los pedidos de los camiones para obtener paquetes, recibe el tipo de paqeute que esperan
+	//y revisa las colas para enviarselos
+
 	var candado sync.Mutex
 	var a string
 	if in.GetClase() == 1 {
@@ -131,6 +137,9 @@ func (c *ServerCamion) PedirPaquete(ctx context.Context, in *Tipo) (*Paquete, er
 }
 
 func (c *ServerCamion) DevolverPaquete(ctx context.Context, in *Paquete) (*Paquete, error) {
+	//recibe los paquetes de forma simbolica, estén o no recibidos, permite obtener el estado y la
+	//cantidad de intentos que le tomó al camión terminar con el paquete
+
 	var candado sync.Mutex
 	candado.Lock()
 

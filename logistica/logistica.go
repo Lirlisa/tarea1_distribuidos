@@ -16,10 +16,13 @@ import (
 )
 
 func main() {
+	//variable de sincronización de go routines
 	var wait sync.WaitGroup
+
 	//setear seed para los números de seguimiento
 	rand.Seed(time.Now().UnixNano())
 
+	//se abren los puertos
 	listenerCliente, err1 := net.Listen("tcp", ":9000")
 	listenerCamion, err2 := net.Listen("tcp", ":9001")
 	if err1 != nil {
@@ -31,6 +34,7 @@ func main() {
 
 	fmt.Println("Iniciado servidor en escucha en puerto 9000 y 9001")
 
+	//se ejecuta cada listener en rutinas distintas
 	wait.Add(2)
 	go func() {
 		escucharCliente(listenerCliente)
@@ -40,15 +44,13 @@ func main() {
 		escucharCamion(listenerCamion)
 		wait.Done()
 	}()
-	/*go func() {
-		conectarFinanzas()
-		wait.Done()
-	}()*/
 
 	wait.Wait()
 }
 
 func escucharCliente(listener net.Listener) {
+	//función encargada del servidor para escuchar al cliente, termina cuando ocurra un error es el servidor grpc
+	//o en el listener
 	servidorCliente := ClienteLogistica.ServerCliente{}
 	Estructuras.GrpcServerCliente = grpc.NewServer()
 	ClienteLogistica.RegisterInteraccionesServer(Estructuras.GrpcServerCliente, &servidorCliente)
@@ -59,6 +61,8 @@ func escucharCliente(listener net.Listener) {
 }
 
 func escucharCamion(listener net.Listener) {
+	//función encargada del servidor para escuchar al camion, termina cuando ocurra un error es el servidor grpc
+	//o en el listener
 	servidorCamion := CamionLogistica.ServerCamion{}
 	Estructuras.GrpcServerCamion = grpc.NewServer()
 	CamionLogistica.RegisterInteraccionesServer(Estructuras.GrpcServerCamion, &servidorCamion)

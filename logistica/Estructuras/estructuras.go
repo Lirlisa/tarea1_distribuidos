@@ -6,6 +6,7 @@ import (
 	"google.golang.org/grpc"
 )
 
+//dato que permite abstraer a los paquetes como dato local
 type Paquete struct {
 	IDPaquete   uint32
 	Seguimiento uint32
@@ -15,6 +16,7 @@ type Paquete struct {
 	Estado      uint32
 }
 
+//dato que permite abstraer los registros
 type Registro struct {
 	Timestamp   time.Time
 	Id          uint32
@@ -26,14 +28,19 @@ type Registro struct {
 	Seguimiento int32
 }
 
-var Tabla map[uint32]*Registro = make(map[uint32]*Registro)
-var SeguimientoAId map[uint32]uint32 = make(map[uint32]uint32)
+//inicialización de estructuras globales para compartir información entre los distintos paquetes
 
-var Paquetes map[uint32]*Paquete = make(map[uint32]*Paquete)
+var Tabla map[uint32]*Registro = make(map[uint32]*Registro)    //almacacena los registros
+var SeguimientoAId map[uint32]uint32 = make(map[uint32]uint32) //permite mapear los valores del seguimiento a las id
+
+var Paquetes map[uint32]*Paquete = make(map[uint32]*Paquete) //mantiene los paquetes
+
+//las colas de los pedidos según tipo
 var ColaRetail []Paquete = make([]Paquete, 0, 10)
 var ColaPrioridad []Paquete = make([]Paquete, 0, 10)
 var ColaNormal []Paquete = make([]Paquete, 0, 10)
 
+//almacena los listener de cada servidor
 var GrpcServerCliente *grpc.Server
 var GrpcServerCamion *grpc.Server
 

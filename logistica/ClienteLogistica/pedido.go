@@ -20,6 +20,9 @@ type ServerCliente struct {
 }
 
 func (s *ServerCliente) Encargar(ctx context.Context, in *Encargo) (*Producto, error) {
+	//recibe los encargos del cliente, recupera los datos necesarios para asignar el pedido/
+	//y lo deja en la cola que corresponda
+
 	log.Printf("Se ha recibido encargo: %s", in.TipoLocal)
 	content := fmt.Sprintf("%s,%s,%d,%s,%s\n", in.GetTipoLocal(), in.GetNombreProducto(), in.GetValor(), in.GetOrigen(), in.GetDestino())
 	var candado sync.Mutex
@@ -88,6 +91,7 @@ func (s *ServerCliente) Encargar(ctx context.Context, in *Encargo) (*Producto, e
 
 }
 func (s *ServerCliente) EstadoEncargo(ctx context.Context, in *Producto) (*Estatus, error) {
+	//se encarga de entregar los estados de los paquetes, recbe un número de seguimiento
 	log.Printf("Solicitado estado de %d", in.ID)
 	var candado sync.Mutex
 	candado.Lock()
