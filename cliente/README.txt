@@ -15,3 +15,6 @@ función de la maquina, pero sin tildes ni mayusculas, ej.:
 
 Luego basta con hacer make y se ejecutará automáticamente.
 Se recomienda iniciar logistica antes que cualquier otra máquina.
+
+Los registros de los camiones son los archivos "camionX.txt" donde "X" es el número del camión (1(retail),2(retail),3(pyme)) 
+El registro de finanzas es el archivo "resumen.txt"
