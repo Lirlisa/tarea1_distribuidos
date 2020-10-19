@@ -133,44 +133,7 @@ func (c *ServerCamion) PedirPaquete(ctx context.Context, in *Tipo) (*Paquete, er
 func (c *ServerCamion) DevolverPaquete(ctx context.Context, in *Paquete) (*Paquete, error) {
 	var candado sync.Mutex
 	candado.Lock()
-	if in.GetTipo() == "gg" {
-		if contador == 2 {
-			defer Estructuras.GrpcServerCamion.GracefulStop()
-			candado.Unlock()
-			conn, err := amqp.Dial("amqp://admin:password@dist46:5672/")
-			failOnError(err, "Failed to connect to RabbitMQ")
-			defer conn.Close()
 
-			ch, err := conn.Channel()
-			failOnError(err, "Failed to open a channel")
-			defer ch.Close()
-
-			q, err := ch.QueueDeclare(
-				"hello", // name
-				false,   // durable
-				false,   // delete when unused
-				false,   // exclusive
-				false,   // no-wait
-				nil,     // arguments
-			)
-			failOnError(err, "Failed to declare a queue")
-			var body string
-			body = `{"terminado": "1", "estado": "0", "intentos": "0", "valor": "0", "tipo": "0", "id": "0"}`
-
-			err = ch.Publish(
-				"",     // exchange
-				q.Name, // routing key
-				false,  // mandatory
-				false,  // immediate
-				amqp.Publishing{
-					ContentType: "text/plain",
-					Body:        []byte(body),
-				})
-			failOnError(err, "Failed to publish a message")
-		}
-		contador++
-		return in, nil
-	}
 	Estructuras.Paquetes[in.IDPaquete].Intentos = in.GetIntentos()
 	Estructuras.Paquetes[in.IDPaquete].Estado = in.GetEstado()
 	candado.Unlock()

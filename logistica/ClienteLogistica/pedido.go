@@ -21,11 +21,6 @@ type ServerCliente struct {
 
 func (s *ServerCliente) Encargar(ctx context.Context, in *Encargo) (*Producto, error) {
 	log.Printf("Se ha recibido encargo: %s", in.TipoLocal)
-	if in.TipoLocal == "gg" {
-		paqueteFinal()
-		defer Estructuras.GrpcServerCliente.GracefulStop()
-		return &Producto{ID: 0}, nil
-	}
 	content := fmt.Sprintf("%s,%s,%d,%s,%s\n", in.GetTipoLocal(), in.GetNombreProducto(), in.GetValor(), in.GetOrigen(), in.GetDestino())
 	var candado sync.Mutex
 	candado.Lock()
@@ -102,28 +97,4 @@ func (s *ServerCliente) EstadoEncargo(ctx context.Context, in *Producto) (*Estat
 	}
 	candado.Unlock()
 	return &Estatus{Valor: 4}, nil //el extraño caso en que no exista el paquete
-}
-
-func paqueteFinal() {
-	var candado sync.Mutex
-	paquete := new(Estructuras.Paquete)
-	paquete.Tipo = "gg"
-	registro := new(Estructuras.Registro)
-	registro.Tipo = "gg"
-	candado.Lock()
-	Estructuras.Paquetes[paquete.IDPaquete] = paquete
-	Estructuras.Tabla[registro.Id] = registro
-	for i := 0; i < 3; i++ {
-		Estructuras.ColaRetail = append(Estructuras.ColaRetail, *paquete)
-		Estructuras.ColaPrioridad = append(Estructuras.ColaPrioridad, *paquete)
-		Estructuras.ColaNormal = append(Estructuras.ColaNormal, *paquete)
-	}
-	candado.Unlock()
-
-}
-
-func failOnError(err error, msg string) {
-	if err != nil {
-		log.Fatalf("%s: %s", msg, err)
-	}
 }
