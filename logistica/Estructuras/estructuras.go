@@ -6,7 +6,7 @@ import (
 	"google.golang.org/grpc"
 )
 
-//dato que permite abstraer a los paquetes como dato local
+//dato que permite abstraer a los paquetes como dato local (el que se pide en el enunciado)
 type Paquete struct {
 	IDPaquete   uint32
 	Seguimiento uint32

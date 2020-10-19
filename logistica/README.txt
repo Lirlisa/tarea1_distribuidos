@@ -18,3 +18,6 @@ Se recomienda iniciar logistica antes que cualquier otra máquina.
 
 Los registros de los camiones son los archivos "camionX.txt" donde "X" es el número del camión (1(retail),2(retail),3(pyme)) 
 El registro de finanzas es el archivo "resumen.txt"
+
+Los registros de logistica se almacenan en el archivo 'bitacora.csv' que está en el directorio de logistica,
+almacenana registro entre ejecuciones.

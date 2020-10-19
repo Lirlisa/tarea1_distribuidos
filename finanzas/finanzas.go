@@ -128,7 +128,7 @@ func main() {
 					}
 					//Se escribe en el registro
 					if str, ok := (info["id"]).(string); ok {
-						file.WriteString("Pedido: " + str + " " + estado + " " + intento + " " + textoGanancias + " " + textoPerdidas + " " + textoTotal + "\n")
+						file.WriteString("Pedido id: " + str + " " + estado + " " + intento + " " + textoGanancias + " " + textoPerdidas + " " + textoTotal + "\n")
 					}
 
 					//Se actualizan los valores generales
