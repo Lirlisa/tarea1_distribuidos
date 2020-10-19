@@ -130,7 +130,7 @@ func main() {
 		}
 	}()
 
-	log.Printf(" [*] Waiting for messages. To exit press CTRL+C")
+	log.Printf("[*] Presione Ctrl+C para terminar ejecución y recibir los totales:\n")
 	<-forever
 }
 
